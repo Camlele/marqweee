@@ -28,63 +28,78 @@
 // }
 
 // document.getElementById("btnPopulate").addEventListener("click", showLayerNames);
+const uxp = require("uxp");
 
+const openDialog = async () => {
+	const res = await document.querySelector("#dialog").uxpShowModal({
+		title: "About",
+		resize: "both", // "horizontal", "vertical", "none"
+		size: {
+			width: 464,
+			height: 380
+		}
+	})
+	console.log(`The dialog closed with: ${res}`)
+}
+document
+    .getElementById("dialogButton")
+    .addEventListener("click", openDialog);
 
 //------------------------------------------------------------------------------------------------------------------------
 
 
 //select layer bounds
-async function selectLayerBounds() {
-const executeAsModalFunction = async (executionContext) => {
+// async function selectLayerBounds() {
+// const executeAsModalFunction = async (executionContext) => {
 
-const { app } = require('photoshop');
-const { BatchPlay } = require("photoshop");
+// const { app } = require('photoshop');
+// const { BatchPlay } = require("photoshop");
 
-    const doc = app.activeDocument;
-    const layer = doc.activeLayers[0]; // Getting the first active layer
+//     const doc = app.activeDocument;
+//     const layer = doc.activeLayers[0]; // Getting the first active layer
 
-    // Checks if the layer is empty
-    if (layer.bounds.left === layer.bounds.right && layer.bounds.top === layer.bounds.bottom) {
-        await doc.selectAll();
-    } else {
-        // Gets dimensions of the layer
-        let layerX = layer.bounds.left;
-        let layerY = layer.bounds.top;
-        let layerWidth = layer.bounds.right - layer.bounds.left;
-        let layerHeight = layer.bounds.bottom - layer.bounds.top;
+//     // Checks if the layer is empty
+//     if (layer.bounds.left === layer.bounds.right && layer.bounds.top === layer.bounds.bottom) {
+//         await doc.selectAll();
+//     } else {
+//         // Gets dimensions of the layer
+//         let layerX = layer.bounds.left;
+//         let layerY = layer.bounds.top;
+//         let layerWidth = layer.bounds.right - layer.bounds.left;
+//         let layerHeight = layer.bounds.bottom - layer.bounds.top;
 
-        // UXP selection using batchPlay (similar to action manager code)
-        await BatchPlay(
-            [
-                {
-                    "_obj": "set",
-                    "_target": [
-                        {
-                            "_ref": "channel",
-                            "_property": "selection"
-                        }
-                    ],
-                    "to": {
-                        "_obj": "rectangle",
-                        "top": { "_unit": "pixels", "_value": layerY },
-                        "left": { "_unit": "pixels", "_value": layerX },
-                        "bottom": { "_unit": "pixels", "_value": layerY + layerHeight },
-                        "right": { "_unit": "pixels", "_value": layerX + layerWidth }
-                    }
-                }
-            ],
-            { "synchronousExecution": false }
-        );
-    }
-}
-await core.executeAsModal(executeAsModalFunction, {commandName: "Select Layer Bounds"});
+//         // UXP selection using batchPlay (similar to action manager code)
+//         await BatchPlay(
+//             [
+//                 {
+//                     "_obj": "set",
+//                     "_target": [
+//                         {
+//                             "_ref": "channel",
+//                             "_property": "selection"
+//                         }
+//                     ],
+//                     "to": {
+//                         "_obj": "rectangle",
+//                         "top": { "_unit": "pixels", "_value": layerY },
+//                         "left": { "_unit": "pixels", "_value": layerX },
+//                         "bottom": { "_unit": "pixels", "_value": layerY + layerHeight },
+//                         "right": { "_unit": "pixels", "_value": layerX + layerWidth }
+//                     }
+//                 }
+//             ],
+//             { "synchronousExecution": false }
+//         );
+//     }
+// }
+// await core.executeAsModal(executeAsModalFunction, {commandName: "Select Layer Bounds"});
 
-}
+// }
 
 
-document
-  .getElementById("SelectLayerBounds")
-  .addEventListener("click", selectLayerBounds);
+// document
+//   .getElementById("SelectLayerBounds")
+//   .addEventListener("click", selectLayerBounds);
 
 
 
@@ -195,38 +210,38 @@ document
 
 
 //Find selection center
-const { app } = require("photoshop");
+// const { app } = require("photoshop");
 
-async function addGuides() {
-    // Save current ruler units and set to PIXELS
-    // const initialUnits = app.preferences.rulerUnits;
-    // app.preferences.rulerUnits = "pixels";
+// async function addGuides() {
+//     // Save current ruler units and set to PIXELS
+//     // const initialUnits = app.preferences.rulerUnits;
+//     // app.preferences.rulerUnits = "pixels";
 
-    try {
-        const doc = app.activeDocument;
-        const layer = doc.activeLayers[0];
-        const bounds = layer.bounds;
+//     try {
+//         const doc = app.activeDocument;
+//         const layer = doc.activeLayers[0];
+//         const bounds = layer.bounds;
 
-        const hor = bounds.right - bounds.left;
-        const ver = bounds.bottom - bounds.top;
-        const hCentre = hor / 2 + bounds.left;
-        const vCentre = ver / 2 + bounds.top;
+//         const hor = bounds.right - bounds.left;
+//         const ver = bounds.bottom - bounds.top;
+//         const hCentre = hor / 2 + bounds.left;
+//         const vCentre = ver / 2 + bounds.top;
 
-        // Add horizontal and vertical guides
-        await doc.guides.add("horizontal", vCentre);
-        await doc.guides.add("vertical", hCentre);
+//         // Add horizontal and vertical guides
+//         await doc.guides.add("horizontal", vCentre);
+//         await doc.guides.add("vertical", hCentre);
 
-    } catch (err) {
-        console.error('Failed to execute:', err);
-    } finally {
-        // Restore original units
-        // app.preferences.rulerUnits = initialUnits;
-    }
-}
+//     } catch (err) {
+//         console.error('Failed to execute:', err);
+//     } finally {
+//         // Restore original units
+//         // app.preferences.rulerUnits = initialUnits;
+//     }
+// }
 
 
 
-document
-  .getElementById("FindCenter")
-  .addEventListener("click", addGuides);
+// document
+//   .getElementById("FindCenter")
+//   .addEventListener("click", addGuides);
 

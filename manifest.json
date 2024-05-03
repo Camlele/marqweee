@@ -12,11 +12,6 @@
   "manifestVersion": 5,
   "entrypoints": [
     {
-      "type": "command",
-      "id": "showAlert",
-      "label": "Show alert"
-    },
-    {
       "type": "panel",
       "id": "mainContent",
       "minimumSize": {
@@ -72,12 +67,6 @@
       "label": {
         "default": "Marqweee!"
       }
-    },
-    {
-      "type": "panel",
-      "id": "o_SelectLayerBounds",
-      "entry": "o_SelectLayerBounds.html",
-      "label": "Options - Select layer bounds"
     }
   ],
   "icons": [
