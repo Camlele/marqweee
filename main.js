@@ -195,27 +195,38 @@ document
 
 
 //Find selection center
-#target photoshop;
+const { app } = require("photoshop");
 
-var savedRuler = app.preferences.rulerUnits;        
-app.preferences.rulerUnits = Units.PIXELS;
+async function addGuides() {
+    // Save current ruler units and set to PIXELS
+    // const initialUnits = app.preferences.rulerUnits;
+    // app.preferences.rulerUnits = "pixels";
 
-var doc = activeDocument;
-var layerBounds = doc.activeLayer.bounds
-var hor = layerBounds[2]-layerBounds[0];
-var ver = layerBounds[3]-layerBounds[1];
-var hCentre = hor/2+layerBounds[0];
-var vCentre = ver/2+layerBounds[1];
+    try {
+        const doc = app.activeDocument;
+        const layer = doc.activeLayers[0];
+        const bounds = layer.bounds;
 
-// Add horizontal guide
-doc.guides.add(Direction.HORIZONTAL, vCentre);
-// Add vertical guide
-doc.guides.add(Direction.VERTICAL, hCentre); 
+        const hor = bounds.right - bounds.left;
+        const ver = bounds.bottom - bounds.top;
+        const hCentre = hor / 2 + bounds.left;
+        const vCentre = ver / 2 + bounds.top;
 
-// Add colour sampler to centre of layer
-doc.colorSamplers.add([hCentre, vCentre]); 
+        // Add horizontal and vertical guides
+        await doc.guides.add("horizontal", vCentre);
+        await doc.guides.add("vertical", hCentre);
 
-// Report the co-ordinates in pixels
-alert('Active Layer Centre Point' + '\n' + 'X: ' + hCentre + '\n' + 'Y: ' + vCentre);
+    } catch (err) {
+        console.error('Failed to execute:', err);
+    } finally {
+        // Restore original units
+        // app.preferences.rulerUnits = initialUnits;
+    }
+}
 
-app.preferences.rulerUnits = savedRuler;  
+
+
+document
+  .getElementById("FindCenter")
+  .addEventListener("click", addGuides);
+

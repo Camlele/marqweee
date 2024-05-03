@@ -82,6 +82,7 @@ body {
   flex-direction: column;
   display: flex;
   padding: 12px;
+  overflow: scroll;
 }
 
 .xd .wrapper {
