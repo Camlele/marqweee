@@ -28,22 +28,9 @@
 // }
 
 // document.getElementById("btnPopulate").addEventListener("click", showLayerNames);
-const uxp = require("uxp");
 
-const openDialog = async () => {
-	const res = await document.querySelector("#dialog").uxpShowModal({
-		title: "About",
-		resize: "both", // "horizontal", "vertical", "none"
-		size: {
-			width: 464,
-			height: 380
-		}
-	})
-	console.log(`The dialog closed with: ${res}`)
-}
-document
-    .getElementById("dialogButton")
-    .addEventListener("click", openDialog);
+
+
 
 //------------------------------------------------------------------------------------------------------------------------
 
@@ -244,4 +231,26 @@ document
 // document
 //   .getElementById("FindCenter")
 //   .addEventListener("click", addGuides);
+
+
+//----------------------------------- Options Dialogs -------------------------------------------------------------------------------------
+
+
+//Find Center
+const uxp = require("uxp");
+
+const openDialog = async () => {
+	const res = await document.querySelector("#o_FindCenter").uxpShowModal({
+		title: "About",
+		resize: "both", // "horizontal", "vertical", "none"
+		size: {
+			width: 100,
+			height: 400
+		}
+	})
+	console.log(`The dialog closed with: ${res}`)
+}
+document
+    .getElementById("o_FindCenterButton")
+    .addEventListener("click", openDialog);
 
