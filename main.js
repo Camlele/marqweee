@@ -1,4 +1,5 @@
-//entrypoints
+//------------------------------- entrypoints ------------------------------------
+
 const uxp = require("uxp");
 const { app } = require('photoshop');
 const {executeAsModal} = require("photoshop").core;
@@ -7,7 +8,7 @@ const {batchPlay} = require("photoshop").action;
 //------------------------------- select layer bounds ------------------------------------
 
 async function selectLayerBounds() {
-   const getActiveLayerBounds = async () => {
+   async function getActiveLayerBounds() {
       const result = await batchPlay(
       [
          {
@@ -44,7 +45,7 @@ async function selectLayerBounds() {
       );
    };
    
-   const modifyDocument = async () => {
+   async function modifyDocument() {
       const bounds = await getActiveLayerBounds();
       console.log("Bounds of the active layer:", bounds);
       await createSelectionFromBounds(bounds);
@@ -58,8 +59,10 @@ document
    .getElementById("selectLayerBounds")
    .addEventListener("click", selectLayerBounds);
 
+//------------------------------- find selection center ------------------------------------
 
-//-------------------------------expand/shrink selection------------------------------------
+
+//------------------------------- expand/shrink selection ------------------------------------
 
 async function modifySelection(expandShrinkAction, expandShrinkAmount) {
     async function expandShrinkBatchPlay() {
@@ -114,8 +117,11 @@ document
     handleSelection("contract", event);
 });
 
+//------------------------------- halve selection ------------------------------------
 
-//-------------------------------feather selection------------------------------------
+
+
+//------------------------------- feather selection ------------------------------------
 
 async function featherSelection(featherAmount) {
    async function featherBatchPlay() {
@@ -164,9 +170,7 @@ document
 });
 
 
-
-
-//------------------------------------------------------------------------------------------------------------------------
+//------------------------------- smooth selection ------------------------------------
 
 
 //Find selection center
@@ -206,39 +210,42 @@ document
 //   .addEventListener("click", addGuides);
 
 
-//----------------------------------- Options Dialogs -------------------------------------------------------------------------------------
+//------------------------------- options dialogs ------------------------------------
 
 
 //Find Center
 
-// const openDialog = async (dialogSelector, title, width, height) => {
-// 	const res = await document.querySelector(dialogSelector).uxpShowModal({
-// 		title: title,
-// 		resize: "both", // "horizontal", "vertical", "none"
-// 		size: {
-// 			width: width,
-// 			height: height
-// 		}
-// 	})
-// 	console.log(`The dialog closed with: ${res}`)
-// }
-// document
-//     .getElementById("o_findCenterButton")
-//     .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 100, 400);});
+const openDialog = async (dialogSelector, title, width, height) => {
+	const res = await document.querySelector(dialogSelector).uxpShowModal({
+		title: title,
+		resize: "both", // "horizontal", "vertical", "none"
+		size: {
+			width: width,
+			height: height
+		}
+	})
+	console.log(`The dialog closed with: ${res}`)
+}
+
+
+document
+    .getElementById("o_findCenterButton")
+    .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 100, 400);});
+
+document
+	.getElementById("o_expandShrinkButton")
+	.addEventListener("click", () => {openDialog("#o_expandShrink", "Expand / shrink selection", 100, 480);});
+
+document
+   .getElementById("o_halveSelectionButton")
+   .addEventListener("click", () => {openDialog("#o_halveSelection", "Halve selection", 100, 400);});
+
+document
+	.getElementById("o_featherButton")
+	.addEventListener("click", () => {openDialog("#o_feather", "Feather selection", 100, 480);});
 
 // document
-// 	.getElementById("o_expandShrinkButton")
-// 	.addEventListener("click", () => {openDialog("#o_expandShrink", "Expand / shrink selection", 100, 480);});
-
-// document
-// 	.getElementById("o_featherButton")
-// 	.addEventListener("click", () => {openDialog("#o_feather", "Feather selection", 100, 480);});
-// document
-// 	.getElementById("o_clickExpandAmount")
-// 	.addEventListener("input", evt => {
-// 		console.log('New Value: ${evt.target.value}');});
-
-//make the id "o_clickExpandAmount" able to be altered by the user and store the result in a variable
-
+// 	.getElementById("o_smoothSelectionButton")
+// 	.addEventListener("click", () => {openDialog("#o_smoothSelection", "Smooth selection", 100, 480);});
 
 
