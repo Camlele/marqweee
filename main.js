@@ -124,78 +124,70 @@ const {executeAsModal} = require("photoshop").core;
 const {batchPlay} = require("photoshop").action;
 
 
-//different input on alt-click
-async function expandSelection() {
-let expandAmount = await document.getElementById("o_clickExpandAmount").value;
-document.getElementById("o_clickExpandAmount").addEventListener("input", evt => {expandAmount = evt.target.value;});
-
-// if (event.altKey) {
-//   console.log('altKey');
-//   expandAmount = document.getElementById("o_altClickExpandAmount").value;
-// }
-
-async function actionCommands() {
-   const result = await batchPlay(
-      [
-         {
-            _obj: "expand",
-            by: {
-               _unit: "pixelsUnit",
-               _value: expandAmount
-            },
-            selectionModifyEffectAtCanvasBounds: false,
-            _options: {
-               dialogOptions: "dontDisplay"
+async function modifySelection(expandShrinkAction, expandShrinkAmount) {
+   async function actionCommands() {
+      const result = await batchPlay(
+         [
+            {
+               _obj: expandShrinkAction, // "expand" or "contract" passed through handleSelection()
+               by: {
+                  _unit: "pixelsUnit",
+                  _value: expandShrinkAmount
+               },
+               selectionModifyEffectAtCanvasBounds: false,
+               _options: {
+                  dialogOptions: "dontDisplay"
+               }
             }
-         }
-      ],
-      {}
-   );
+         ],
+         {}
+      );
+   }
+   async function runModalFunction() {
+      await executeAsModal(actionCommands, {"commandName": "Action Commands"});
+   }
+   
+   await runModalFunction();
 }
 
-async function runModalFunction() {
-   await executeAsModal(actionCommands, {"commandName": "Action Commands"});
+async function handleSelection(expandShrinkAction) {
+   let expandShrinkAmountString = await document.getElementById(`o_click_${expandShrinkAction}Amount`).value;
+   document.getElementById(`o_click_${expandShrinkAction}Amount`).addEventListener("input", evt => {expandShrinkAmountString = evt.target.value;});
+   let expandShrinkAmount = parseInt(expandShrinkAmountString);
+   if (isNaN(expandShrinkAmount)) {
+      expandShrinkAmount = 1;
+   }
+   await modifySelection(expandShrinkAction, expandShrinkAmount);
 }
 
-await runModalFunction();
+//expand
+async function expandSelection() {
+   await handleSelection("expand"); //modifies both string ID and batchPlay _obj value
 }
-
 document
   .getElementById("expandSelection")
   .addEventListener("click", expandSelection);
 
-//shrink selection
-  
+//shrink
 async function shrinkSelection() {
-async function actionCommands() {
-    const result = await batchPlay(
-       [
-          {
-             _obj: "contract",
-            by: {
-               _unit: "pixelsUnit",
-                _value: 5
-             },
-             selectionModifyEffectAtCanvasBounds: false,
-             _options: {
-               dialogOptions: "dontDisplay"
-            }
-          }
-       ],
-       {}
-    );
-  }
-  
-async function runModalFunction() {
-   await executeAsModal(actionCommands, {"commandName": "Action Commands"});
+   await handleSelection("contract");
 }
-  
-await runModalFunction();
-}
-
 document
-.getElementById("shrinkSelection")
-.addEventListener("click", shrinkSelection);
+  .getElementById("shrinkSelection")
+  .addEventListener("click", shrinkSelection);
+
+
+// alt click. figure this out, it used to work...
+
+// const handleClick = (event) => {
+//    if (event.altKey) {
+//      console.log('altKey');
+//      expandAmountString = document.getElementById("o_altClickExpandAmount").value;
+//      document.getElementById("o_altClickExpandAmount").addEventListener("input", evt => {expandAmountString = evt.target.value;});
+//    }};
+
+
+
 
 
 //------------------------------------------------------------------------------------------------------------------------
