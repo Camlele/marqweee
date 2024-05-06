@@ -1,3 +1,6 @@
+const uxp = require("uxp");
+
+
 // const { entrypoints } = require("uxp");
 
 //   showAlert = () => {
@@ -116,81 +119,83 @@
 
 
 
-// //expand selection
-// const {executeAsModal} = require("photoshop").core;
-// const {batchPlay} = require("photoshop").action;
+//expand selection
+const {executeAsModal} = require("photoshop").core;
+const {batchPlay} = require("photoshop").action;
 
-// //different input on alt-click
-// async function expandSelection(event) {
-// let expandAmount = 1;
+
+//different input on alt-click
+async function expandSelection() {
+let expandAmount = await document.getElementById("o_clickExpandAmount").value;
+document.getElementById("o_clickExpandAmount").addEventListener("input", evt => {expandAmount = evt.target.value;});
 
 // if (event.altKey) {
 //   console.log('altKey');
-//   expandAmount = 5;
+//   expandAmount = document.getElementById("o_altClickExpandAmount").value;
 // }
 
-// async function actionCommands() {
-//    const result = await batchPlay(
-//       [
-//          {
-//             _obj: "expand",
-//             by: {
-//                _unit: "pixelsUnit",
-//                _value: expandAmount
-//             },
-//             selectionModifyEffectAtCanvasBounds: false,
-//             _options: {
-//                dialogOptions: "dontDisplay"
-//             }
-//          }
-//       ],
-//       {}
-//    );
-// }
+async function actionCommands() {
+   const result = await batchPlay(
+      [
+         {
+            _obj: "expand",
+            by: {
+               _unit: "pixelsUnit",
+               _value: expandAmount
+            },
+            selectionModifyEffectAtCanvasBounds: false,
+            _options: {
+               dialogOptions: "dontDisplay"
+            }
+         }
+      ],
+      {}
+   );
+}
 
-// async function runModalFunction() {
-//    await executeAsModal(actionCommands, {"commandName": "Action Commands"});
-// }
+async function runModalFunction() {
+   await executeAsModal(actionCommands, {"commandName": "Action Commands"});
+}
 
-// await runModalFunction();
-// }
+await runModalFunction();
+}
 
-// document
-//   .getElementById("expandSelection")
-//   .addEventListener("click", expandSelection);
+document
+  .getElementById("expandSelection")
+  .addEventListener("click", expandSelection);
 
-// //shrink selection
+//shrink selection
   
-// async function shrinkSelection() {
-// async function actionCommands() {
-//     const result = await batchPlay(
-//        [
-//           {
-//              _obj: "contract",
-//             by: {
-//                _unit: "pixelsUnit",
-//                 _value: 30
-//              },
-//              selectionModifyEffectAtCanvasBounds: false,
-//              _options: {
-//                dialogOptions: "dontDisplay"
-//             }
-//           }
-//        ],
-//        {}
-//     );
-//   }
+async function shrinkSelection() {
+async function actionCommands() {
+    const result = await batchPlay(
+       [
+          {
+             _obj: "contract",
+            by: {
+               _unit: "pixelsUnit",
+                _value: 5
+             },
+             selectionModifyEffectAtCanvasBounds: false,
+             _options: {
+               dialogOptions: "dontDisplay"
+            }
+          }
+       ],
+       {}
+    );
+  }
   
-// async function runModalFunction() {
-//    await executeAsModal(actionCommands, {"commandName": "Action Commands"});
-// }
+async function runModalFunction() {
+   await executeAsModal(actionCommands, {"commandName": "Action Commands"});
+}
   
-// await runModalFunction();
-// }
+await runModalFunction();
+}
 
-// document
-// .getElementById("shrinkSelection")
-// .addEventListener("click", shrinkSelection);
+document
+.getElementById("shrinkSelection")
+.addEventListener("click", shrinkSelection);
 
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -237,20 +242,31 @@
 
 
 //Find Center
-const uxp = require("uxp");
 
-const openDialog = async () => {
-	const res = await document.querySelector("#o_FindCenter").uxpShowModal({
-		title: "About",
+const openDialog = async (dialogSelector, title, width, height) => {
+	const res = await document.querySelector(dialogSelector).uxpShowModal({
+		title: title,
 		resize: "both", // "horizontal", "vertical", "none"
 		size: {
-			width: 100,
-			height: 400
+			width: width,
+			height: height
 		}
 	})
 	console.log(`The dialog closed with: ${res}`)
 }
 document
-    .getElementById("o_FindCenterButton")
-    .addEventListener("click", openDialog);
+    .getElementById("o_findCenterButton")
+    .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 100, 400);});
+
+document
+	.getElementById("o_expandShrinkButton")
+	.addEventListener("click", () => {openDialog("#o_expandShrink", "Expand / shrink selection", 100, 480);});
+// document
+// 	.getElementById("o_clickExpandAmount")
+// 	.addEventListener("input", evt => {
+// 		console.log('New Value: ${evt.target.value}');});
+
+//make the id "o_clickExpandAmount" able to be altered by the user and store the result in a variable
+
+
 
