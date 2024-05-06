@@ -172,6 +172,7 @@ document
 
 //------------------------------- smooth selection ------------------------------------
 
+// THIS WILL NEVER WORK JUST GIVE UP LOL
 
 //Find selection center
 // const { app } = require("photoshop");
@@ -212,8 +213,6 @@ document
 
 //------------------------------- options dialogs ------------------------------------
 
-
-//Find Center
 
 const openDialog = async (dialogSelector, title, width, height) => {
 	const res = await document.querySelector(dialogSelector).uxpShowModal({
