@@ -45,8 +45,8 @@ body {
 
   /* dialog styles */
   :not(.xd) dialog {
-    width: 480px;
-    height: 240px;
+    width: auto;
+    height: auto;
     padding: 0;
     margin: 0;
     display: flex;
@@ -82,6 +82,17 @@ body {
   flex-direction: column;
   display: flex;
   padding: 12px;
+  overflow: scroll;
+}
+
+.o_wrapper {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  display: flex;
+  padding: 25px;
   overflow: scroll;
 }
 

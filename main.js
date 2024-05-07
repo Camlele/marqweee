@@ -105,6 +105,9 @@ async function altClickCenter(event) {
        await executeAsModal(async () => {
            await batchPlay([{ _obj: "clearAllGuides" }], {});
        }, { commandName: "Clear All Guides" });
+       await executeAsModal(async () => {
+             await batchPlay([{ _obj: "delete", _target:[{_ref: "colorSampler", _enum: "ordinal", _value: "allEnum"}] }], {});
+          }, { commandName: "Clear All ColorSamplers" });
    } else {
        await findCenter();
    }
@@ -340,19 +343,19 @@ const openDialog = async (dialogSelector, title, width, height) => {
 
 document
     .getElementById("o_findCenterButton")
-    .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 100, 400);});
+    .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 320, 480);});
 
 document
 	.getElementById("o_expandShrinkButton")
-	.addEventListener("click", () => {openDialog("#o_expandShrink", "Expand / shrink selection", 100, 480);});
+	.addEventListener("click", () => {openDialog("#o_expandShrink", "Expand / shrink selection", 320, 480);});
 
 document
    .getElementById("o_halveSelectionButton")
-   .addEventListener("click", () => {openDialog("#o_halveSelection", "Halve selection", 100, 400);});
+   .addEventListener("click", () => {openDialog("#o_halveSelection", "Halve selection", 270, 300);});
 
 document
 	.getElementById("o_featherButton")
-	.addEventListener("click", () => {openDialog("#o_feather", "Feather selection", 100, 480);});
+	.addEventListener("click", () => {openDialog("#o_feather", "Feather selection", 280, 300);});
 
 // document
 // 	.getElementById("o_smoothSelectionButton")
