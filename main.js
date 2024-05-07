@@ -150,8 +150,10 @@ async function altClickCenter(event) {
        await executeAsModal(async () => {
            await batchPlay([{ _obj: "delete", _target:[{_ref: "colorSampler", _enum: "ordinal", _value: "allEnum"}] }], {});
        }, { commandName: "Clear All ColorSamplers" });
+       console.log("All guides were removed");
    } else {
        await findCenter();
+       console.log("Center indicator(s) were placed.")
    }
 }
 
@@ -377,44 +379,51 @@ document
 
 //------------------------------- smooth selection ------------------------------------
 
-// THIS WILL NEVER WORK JUST GIVE UP LOL
+async function smoothSelection(smoothAmount) {
+   async function smoothBatchPlay() {
+      const result = await batchPlay(
+         [{
+               _obj: "smoothness",
+               radius: {
+                  _unit: "pixelsUnit",
+                  _value: smoothAmount
+               },
+               selectionModifyEffectAtCanvasBounds: false,
+               _options: {
+                  dialogOptions: "dontDisplay"
+               }
+         }],
+         {}
+      );
+   }
+   await executeAsModal(smoothBatchPlay, {"commandName": "Smooth amount"});
+}
 
-//Find selection center
-// const { app } = require("photoshop");
+async function altClickSmooth(event) {
+    let inputField = document.getElementById("o_click_smoothAmount");
+    let altInputField = document.getElementById("o_altClick_smoothAmount");
+    
+    let smoothAmountString = event.altKey ? altInputField.value : inputField.value; // bool determines which input to use based on the altKey state
 
-// async function addGuides() {
-//     // Save current ruler units and set to PIXELS
-//     // const initialUnits = app.preferences.rulerUnits;
-//     // app.preferences.rulerUnits = "pixels";
+    let smoothAmount = parseInt(smoothAmountString);
 
-//     try {
-//         const doc = app.activeDocument;
-//         const layer = doc.activeLayers[0];
-//         const bounds = layer.bounds;
+   //Default values
+    if (isNaN(smoothAmount)) {
+        if (event.altKey) {
+         smoothAmount = 15;
+        } else {
+         smoothAmount = 5;
+        }
+    }
+    
+    await smoothSelection(smoothAmount);
+}
 
-//         const hor = bounds.right - bounds.left;
-//         const ver = bounds.bottom - bounds.top;
-//         const hCentre = hor / 2 + bounds.left;
-//         const vCentre = ver / 2 + bounds.top;
-
-//         // Add horizontal and vertical guides
-//         await doc.guides.add("horizontal", vCentre);
-//         await doc.guides.add("vertical", hCentre);
-
-//     } catch (err) {
-//         console.error('Failed to execute:', err);
-//     } finally {
-//         // Restore original units
-//         // app.preferences.rulerUnits = initialUnits;
-//     }
-// }
-
-
-
-// document
-//   .getElementById("FindCenter")
-//   .addEventListener("click", addGuides);
-
+document
+   .getElementById("smoothSelection")
+   .addEventListener("click", function(event) {
+      altClickSmooth(event);
+});
 
 //------------------------------- options dialogs ------------------------------------
 
