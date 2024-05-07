@@ -5,6 +5,7 @@ const Constants = require('photoshop').constants;
 const app = require('photoshop').app;
 const doc = app.activeDocument;
 const {executeAsModal} = require("photoshop").core;
+const { core } = require('photoshop');
 const {batchPlay} = require("photoshop").action;
 
 //------------------------------- select layer bounds ------------------------------------
@@ -62,42 +63,83 @@ document
    .addEventListener("click", selectLayerBounds);
 
 //------------------------------- find selection center ------------------------------------
-
+// Currently only targets the document on which it was activated; needs to target activeDocument
 
 
 async function findCenter() {
    async function getSelectionBounds() {
-      const result = await require("photoshop").action.batchPlay(
-         [{
-            "_obj": "get",
-            "_target": [{
-               "_property": "selection"
-            },
+       const idDoc = doc._id;
+       const result = await batchPlay([
+           {
+               "_obj": "get",
+               "_target": [{
+                   "_property": "selection"
+               },
+               {
+                   "_ref": "document",
+                   "_enum": "ordinal",
+                   "_value": "targetEnum",
+                   "_id": idDoc
+               }]
+           }], {
+               "synchronousExecution": false
+           }
+       );
+
+       const left = result[0].selection.left._value;
+       const top = result[0].selection.top._value;
+       const right = result[0].selection.right._value;
+       const bottom = result[0].selection.bottom._value;
+
+       let centerX = Math.round((left + right) / 2);
+       let centerY = Math.round((top + bottom) / 2);
+
+       centerX = parseInt(centerX);
+       centerY = parseInt(centerY);
+
+       // Check the checkbox states
+       const useColorSampler = document.getElementById("useColorSamplerCheckbox").checked;
+       const useGuides = document.getElementById("useGuidesCheckbox").checked;
+      //  const usePixel = document.getElementById("usePixelCheckbox").checked
+
+       if (useGuides) {
+           doc.guides.add(Constants.Direction.HORIZONTAL, centerY);
+           doc.guides.add(Constants.Direction.VERTICAL, centerX);
+           //await core.performMenuCommand({commandID: 3503}); //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
+       }
+
+      //  if (usePixel) {
+      //  }
+
+       if (useColorSampler) {
+           await batchPlay([
             {
-               "_ref": "document",
-               "_enum": "ordinal",
-               "_value": "targetEnum"
+               _obj: "make",
+               _target: [
+                  {
+                     _ref: "colorSampler"
+                  }
+               ],
+               position: {
+                  _obj: "paint",
+                  horizontal: {
+                     _unit: "pixelsUnit",
+                     _value: centerX
+                  },
+                  vertical: {
+                     _unit: "pixelsUnit",
+                     _value: centerY
+                  }
+               },
+               _options: {
+                  dialogOptions: "dontDisplay"
+               }
             }
-            ]
-         }], {
-            "synchronousExecution": false
-         }
-      );
-   
-      const left = result[0].selection.left._value;
-      const top = result[0].selection.top._value;
-      const right = result[0].selection.right._value;
-      const bottom = result[0].selection.bottom._value;
+           ], {});
+       }
+   } 
 
-      let centerX = Math.round((left + right) / 2);
-      let centerY = Math.round((top + bottom) / 2);
-
-      centerX = parseInt(centerX);
-      centerY = parseInt(centerY);
-
-      doc.guides.add(Constants.Direction.HORIZONTAL, centerY);
-      doc.guides.add(Constants.Direction.VERTICAL, centerX);     
-   } executeAsModal(getSelectionBounds);
+   await executeAsModal(getSelectionBounds);
 }
 
 async function altClickCenter(event) {
@@ -106,8 +148,8 @@ async function altClickCenter(event) {
            await batchPlay([{ _obj: "clearAllGuides" }], {});
        }, { commandName: "Clear All Guides" });
        await executeAsModal(async () => {
-             await batchPlay([{ _obj: "delete", _target:[{_ref: "colorSampler", _enum: "ordinal", _value: "allEnum"}] }], {});
-          }, { commandName: "Clear All ColorSamplers" });
+           await batchPlay([{ _obj: "delete", _target:[{_ref: "colorSampler", _enum: "ordinal", _value: "allEnum"}] }], {});
+       }, { commandName: "Clear All ColorSamplers" });
    } else {
        await findCenter();
    }
@@ -116,8 +158,8 @@ async function altClickCenter(event) {
 document
    .getElementById("FindCenter")
    .addEventListener("click", function(event) {
-   altClickCenter(event);
-});
+       altClickCenter(event);
+   });
 
 
 //------------------------------- expand/shrink selection ------------------------------------
@@ -205,7 +247,7 @@ async function getSelectionBounds() {
 }
 
 async function createSelectionFromBounds(bounds) {
-    const { left, top, width, bottom } = bounds;
+    const { left, top, right, bottom } = bounds;
     await batchPlay(
         [{
             _obj: "set",
@@ -213,26 +255,75 @@ async function createSelectionFromBounds(bounds) {
             to: {
                 _obj: "rectangle",
                 top: top,
-                left: left,
                 bottom: bottom,
-                right: left + width / 2
+                left: left,
+                right: right
             }
         }],
         { synchronousExecution: false, modalBehavior: "execute" }
     );
 }
 
-async function halveSelection() {
-    const bounds = await getSelectionBounds();
-    await createSelectionFromBounds(bounds);
-}
-async function halveSelectionModal() {
-   await executeAsModal(halveSelection, {"commandName": "Halve Selection"});
-}
+async function altClickHalveTop(event) {
+   if (event.altKey) {
+      await executeAsModal(async () => {
+         const bounds = await getSelectionBounds();
+         await createSelectionFromBounds({
+            left: bounds.left,
+            top: bounds.top - (bounds.bottom - bounds.top) / 2 * -1,
+            right: bounds.right,
+            bottom: bounds.bottom 
+   });
+     }, { commandName: "Halve Selection Right" });
+   } else {
+         await executeAsModal(async () => {
+          const bounds = await getSelectionBounds();
+          await createSelectionFromBounds({
+            left: bounds.left, 
+            top: bounds.top,
+            right: bounds.right,
+            bottom: bounds.bottom - (bounds.bottom - bounds.top) / 2
+          });
+      }, { commandName: "Halve Selection Top" });
+      }
+   }
+
+
+async function altClickHalveLeft(event) {
+   if (event.altKey) {
+      await executeAsModal(async () => {
+         const bounds = await getSelectionBounds();
+         await createSelectionFromBounds({
+            left: bounds.left - (bounds.right - bounds.left) / 2 *-1,
+            top: bounds.top,
+            right: bounds.right,
+            bottom: bounds.bottom
+   });
+     }, { commandName: "Halve Selection Right" });
+   } else {
+         await executeAsModal(async () => {
+          const bounds = await getSelectionBounds();
+          await createSelectionFromBounds({
+            left: bounds.left, 
+            top: bounds.top,
+            right: bounds.right - (bounds.right - bounds.left) / 2,
+            bottom: bounds.bottom
+          });
+      }, { commandName: "Halve Selection Left" });
+      }
+   }
+   
 
 document
    .getElementById("halveSelectionLeft")
-   .addEventListener("click", halveSelectionModal);
+   .addEventListener("click", function(event) {
+      altClickHalveLeft(event);
+  });
+document
+   .getElementById("halveSelectionTop")
+   .addEventListener("click", function(event) {
+      altClickHalveTop(event);
+});
 
 
 //------------------------------- feather selection ------------------------------------
@@ -331,7 +422,7 @@ document
 const openDialog = async (dialogSelector, title, width, height) => {
 	const res = await document.querySelector(dialogSelector).uxpShowModal({
 		title: title,
-		resize: "both", // "horizontal", "vertical", "none"
+		resize: "none", // "horizontal", "vertical", "none", "both"
 		size: {
 			width: width,
 			height: height
@@ -343,7 +434,7 @@ const openDialog = async (dialogSelector, title, width, height) => {
 
 document
     .getElementById("o_findCenterButton")
-    .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 320, 480);});
+    .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 320, 350);});
 
 document
 	.getElementById("o_expandShrinkButton")
@@ -358,8 +449,8 @@ document
 	.addEventListener("click", () => {openDialog("#o_feather", "Feather selection", 280, 300);});
 
 // document
-// 	.getElementById("o_smoothSelectionButton")
-// 	.addEventListener("click", () => {openDialog("#o_smoothSelection", "Smooth selection", 100, 480);});
+// 	.getElementById("smoothSelectionButton")
+// 	.addEventListener("click", smoothSelectionButton);
 
 document.getElementById("okButton").addEventListener("click", function() {
    res.close('ok');
