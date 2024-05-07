@@ -1,7 +1,9 @@
 //------------------------------- entrypoints ------------------------------------
 
 const uxp = require("uxp");
-const { app } = require('photoshop');
+const Constants = require('photoshop').constants;
+const app = require('photoshop').app;
+const doc = app.activeDocument;
 const {executeAsModal} = require("photoshop").core;
 const {batchPlay} = require("photoshop").action;
 
@@ -62,13 +64,66 @@ document
 //------------------------------- find selection center ------------------------------------
 
 
+
+async function findCenter() {
+   async function getSelectionBounds() {
+      const result = await require("photoshop").action.batchPlay(
+         [{
+            "_obj": "get",
+            "_target": [{
+               "_property": "selection"
+            },
+            {
+               "_ref": "document",
+               "_enum": "ordinal",
+               "_value": "targetEnum"
+            }
+            ]
+         }], {
+            "synchronousExecution": false
+         }
+      );
+   
+      const left = result[0].selection.left._value;
+      const top = result[0].selection.top._value;
+      const right = result[0].selection.right._value;
+      const bottom = result[0].selection.bottom._value;
+
+      let centerX = Math.round((left + right) / 2);
+      let centerY = Math.round((top + bottom) / 2);
+
+      centerX = parseInt(centerX);
+      centerY = parseInt(centerY);
+
+      doc.guides.add(Constants.Direction.HORIZONTAL, centerY);
+      doc.guides.add(Constants.Direction.VERTICAL, centerX);     
+   } executeAsModal(getSelectionBounds);
+}
+
+async function altClickCenter(event) {
+   if (event.altKey) {
+       await executeAsModal(async () => {
+           await batchPlay([{ _obj: "clearAllGuides" }], {});
+       }, { commandName: "Clear All Guides" });
+   } else {
+       await findCenter();
+   }
+}
+
+document
+   .getElementById("FindCenter")
+   .addEventListener("click", function(event) {
+   altClickCenter(event);
+});
+
+
 //------------------------------- expand/shrink selection ------------------------------------
 
 async function modifySelection(expandShrinkAction, expandShrinkAmount) {
     async function expandShrinkBatchPlay() {
         const result = await batchPlay(
             [{
-                _obj: expandShrinkAction, // "expand" or "contract" passed through handleSelection()
+                _obj: expandShrinkAction, // "expand" or "contract" passed through altClickSelection()
                 by: {
                     _unit: "pixelsUnit",
                     _value: expandShrinkAmount
@@ -84,7 +139,7 @@ async function modifySelection(expandShrinkAction, expandShrinkAmount) {
     await executeAsModal(expandShrinkBatchPlay, {"commandName": "Action Commands"});
 }
 
-async function handleSelection(expandShrinkAction, event) {
+async function altClickSelection(expandShrinkAction, event) {
     let inputField = document.getElementById(`o_click_${expandShrinkAction}Amount`);
     let altInputField = document.getElementById(`o_altClick_${expandShrinkAction}Amount`);
     
@@ -108,17 +163,73 @@ async function handleSelection(expandShrinkAction, event) {
 document
    .getElementById("expandSelection")
    .addEventListener("click", function(event) {
-    handleSelection("expand", event); //modifies both string ID and batchPlay _obj value
+    altClickSelection("expand", event); //modifies both string ID and batchPlay _obj value
 });
 //Shrink
 document
    .getElementById("shrinkSelection")
    .addEventListener("click", function(event) {
-    handleSelection("contract", event);
+    altClickSelection("contract", event);
 });
 
 //------------------------------- halve selection ------------------------------------
 
+async function getSelectionBounds() {
+    const result = await batchPlay(
+        [{
+            _obj: "get",
+            _target: [{
+                _property: "selection"
+            }, {
+                _ref: "document",
+                _enum: "ordinal",
+                _value: "targetEnum"
+            }]
+        }], {
+            synchronousExecution: false,
+            modalBehavior: "execute"
+        }
+    );
+
+    const left = result[0].selection.left._value;
+    const top = result[0].selection.top._value;
+    const right = result[0].selection.right._value;
+    const bottom = result[0].selection.bottom._value;
+    const width = right - left;
+    const height = bottom - top;
+
+    return { left, top, right, bottom, width, height };
+}
+
+async function createSelectionFromBounds(bounds) {
+    const { left, top, width, bottom } = bounds;
+    await batchPlay(
+        [{
+            _obj: "set",
+            _target: [{ _ref: "channel", _property: "selection" }],
+            to: {
+                _obj: "rectangle",
+                top: top,
+                left: left,
+                bottom: bottom,
+                right: left + width / 2
+            }
+        }],
+        { synchronousExecution: false, modalBehavior: "execute" }
+    );
+}
+
+async function halveSelection() {
+    const bounds = await getSelectionBounds();
+    await createSelectionFromBounds(bounds);
+}
+async function halveSelectionModal() {
+   await executeAsModal(halveSelection, {"commandName": "Halve Selection"});
+}
+
+document
+   .getElementById("halveSelectionLeft")
+   .addEventListener("click", halveSelectionModal);
 
 
 //------------------------------- feather selection ------------------------------------
@@ -143,7 +254,7 @@ async function featherSelection(featherAmount) {
    await executeAsModal(featherBatchPlay, {"commandName": "Action Commands"});
 }
 
-async function handleFeather(event) {
+async function altClickFeather(event) {
     let inputField = document.getElementById("o_click_featherAmount");
     let altInputField = document.getElementById("o_altClick_featherAmount");
     
@@ -166,7 +277,7 @@ async function handleFeather(event) {
 document
    .getElementById("featherSelection")
    .addEventListener("click", function(event) {
-      handleFeather(event);
+      altClickFeather(event);
 });
 
 
@@ -247,4 +358,10 @@ document
 // 	.getElementById("o_smoothSelectionButton")
 // 	.addEventListener("click", () => {openDialog("#o_smoothSelection", "Smooth selection", 100, 480);});
 
+document.getElementById("okButton").addEventListener("click", function() {
+   res.close('ok');
+});
 
+document.getElementById("cancelButton").addEventListener("click", function() {
+   require('uxp').host.closeModal();
+});

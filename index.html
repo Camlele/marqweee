@@ -15,6 +15,9 @@
     flex-direction: column; 
     margin-left: 10px;
   };
+  #ok-button {
+    variant: "primary";
+  }
 </style>
 
 <body>
@@ -102,6 +105,7 @@
 <!---------------------- Option Dialogs ---------------------->
 
 
+
 <!------- Find Center ------->
 <dialog id="o_findCenter">
   <sp-body>
@@ -110,7 +114,7 @@
 
         <sp-label size="L">Crosshair type:</sp-label>
         <sp-field-group>
-          <sp-checkbox size="s">Guides</sp-checkbox>
+          <sp-checkbox size="s" checked>Guides</sp-checkbox>
           <sp-checkbox size="s">Crosshair layer</sp-checkbox>
           <sp-checkbox size="s">Colour sampler</sp-checkbox>
         </sp-field-group>
@@ -121,7 +125,7 @@
           <sp-checkbox size="s">Entire canvas</sp-checkbox>
           <sp-checkbox size="s">Selection</sp-checkbox>
         </sp-field-group>
-<hr>
+<hr style="margin-top: 15px;">
         <sp-field-group style="padding-top: 5px;">
           <sp-checkbox size="s">Display coordinates?</sp-checkbox>
         </sp-field-group>
@@ -131,14 +135,14 @@
       <footer class="optionsFooter">
         <sp-action-group style="display: flex; justify-content: flex-start; margin-top: 20px;">
           <div style="padding: 10px;">
-          <sp-action-button id="okButton" primary>
+          <sp-button id="okButton" variant="primary">
             Ok
-          </sp-action-button>
+          </sp-button>
           </div>
           <div style="padding: 10px;">
-          <sp-action-button id="cancelButton">
+          <sp-button id="cancelButton" variant="secondary">
             Cancel
-          </sp-action-button>
+          </sp-button>
           </div>
         </sp-action-group>
       </footer>
@@ -153,7 +157,7 @@
     <div class="wrapper" id="optionDialogs">
       <sp-action-group>
 
-        <sp-label size="L">Expand selection amount</sp-label>
+        <sp-label size="L">Expand selection amount:</sp-label>
 
         <sp-field-group>
           <sp-label size="s" style="margin-bottom: 5px;">Value in pixels</sp-label>
@@ -167,7 +171,7 @@
 
         <hr>
 
-        <sp-label size="L">Shrink selection amount</sp-label>
+        <sp-label size="L">Shrink selection amount:</sp-label>
 
         <sp-field-group>
           <sp-label size="s" style="margin-bottom: 5px;">Value in pixels</sp-label>
@@ -182,14 +186,14 @@
         <footer class="optionsFooter">
           <sp-action-group style="display: flex; justify-content: flex-start; margin-top: 10px;">
             <div style="padding: 10px;">
-            <sp-action-button id="okButton">
+            <sp-button id="okButton" variant="primary">
               Ok
-            </sp-action-button>
+            </sp-button>
             </div>
             <div style="padding: 10px;">
-            <sp-action-button id="cancelButton">
+            <sp-button id="cancelButton" variant="secondary">
               Cancel
-            </sp-action-button>
+            </sp-button>
             </div>
           </sp-action-group>
         </footer>
@@ -205,48 +209,29 @@
     <div class="wrapper" id="optionDialogs">
       <sp-action-group>
 
-        <sp-label size="L">Expand selection amount</sp-label>
-
+        <sp-label size="L">Default to:</sp-label>
         <sp-field-group>
-          <sp-label size="s" style="margin-bottom: 5px;">Value in pixels</sp-label>
-          <sp-textfield type="number" id="o_click_expandAmount" width="50px" style="margin-bottom: 10px;" placeholder="1"></sp-textfield>
+          <sp-checkbox size="s" checked>Active selection</sp-checkbox>
+          <sp-checkbox size="s">Entire canvas</sp-checkbox>
         </sp-field-group>
-
-        <sp-field-group>
-          <sp-label size="s" style="margin-bottom: 5px;">Alt+Click value in pixels</sp-label>
-          <sp-textfield type="number" id="o_altClick_expandAmount" width="50px" style="margin-bottom: 10px;" placeholder="5"></sp-textfield>
-        </sp-field-group>
-
-        <hr>
-
-        <sp-label size="L">Shrink selection amount</sp-label>
-
-        <sp-field-group>
-          <sp-label size="s" style="margin-bottom: 5px;">Value in pixels</sp-label>
-          <sp-textfield type="number" id="o_click_contractAmount" width="50px" style="margin-bottom: 10px;" placeholder="1"></sp-textfield>
-        </sp-field-group>
-
-        <sp-field-group>
-          <sp-label size="s" style="margin-bottom: 5px;">Alt+Click value in pixels</sp-label>
-          <sp-textfield type="number" id="o_altClick_contractAmount" width="50px" placeholder="5"></sp-textfield>
-        </sp-field-group>
-
-        <footer class="optionsFooter">
-          <sp-action-group style="display: flex; justify-content: flex-start; margin-top: 10px;">
-            <div style="padding: 10px;">
-            <sp-action-button id="okButton">
-              Ok
-            </sp-action-button>
-            </div>
-            <div style="padding: 10px;">
-            <sp-action-button id="cancelButton">
-              Cancel
-            </sp-action-button>
-            </div>
-          </sp-action-group>
-        </footer>
 
       </sp-action-group>
+
+      <footer class="optionsFooter">
+        <sp-action-group style="display: flex; justify-content: flex-start; margin-top: 20px;">
+          <div style="padding: 10px;">
+          <sp-button id="okButton" variant="primary">
+            Ok
+          </sp-button>
+          </div>
+          <div style="padding: 10px;">
+          <sp-button id="cancelButton" variant="secondary">
+            Cancel
+          </sp-button>
+          </div>
+        </sp-action-group>
+      </footer>
+
     </div>
   </sp-body>
 </dialog>
@@ -257,7 +242,7 @@
     <div class="wrapper" id="optionDialogs">
       <sp-action-group>
 
-        <sp-label size="L">Feather amount</sp-label>
+        <sp-label size="L">Feather amount:</sp-label>
 
         <sp-field-group>
           <sp-label size="s" style="margin-bottom: 5px;">Value in pixels</sp-label>
@@ -272,14 +257,14 @@
         <footer class="optionsFooter">
           <sp-action-group style="display: flex; justify-content: flex-start; margin-top: 10px;">
             <div style="padding: 10px;">
-            <sp-action-button id="okButton">
+            <sp-button id="okButton" variant="primary">
               Ok
-            </sp-action-button>
+            </sp-button>
             </div>
             <div style="padding: 10px;">
-            <sp-action-button id="cancelButton">
+            <sp-button id="cancelButton" variant="secondary">
               Cancel
-            </sp-action-button>
+            </sp-button>
             </div>
           </sp-action-group>
         </footer>
