@@ -132,8 +132,8 @@
           </sp-action-button>
         </sp-action-group>
 
-        <!--Smooth selection corners-->
-        <sp-label>Smooth selection corners</sp-label>
+        <!--Smooth selection-->
+        <sp-label>Smooth selection</sp-label>
         <sp-action-group style="display: flex; justify-content: space-between;">
           <sp-action-button label="Edit" id="smoothSelectionButton">
             <div slot="icon" class="icon">
@@ -141,7 +141,7 @@
             </div>
           </sp-action-button>
 
-          <sp-action-button label="Edit">
+          <sp-action-button label="Edit" id="o_smoothSelectionButton">
             <div slot="icon" class="icon">
               <svg id="a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><path d="M439,785c0-41.42,33.58-75,75-75h0c41.42,0,75,33.58,75,75h0c0,41.42-33.58,75-75,75h0c-41.42,0-75-33.58-75-75ZM439,485c0-41.42,33.58-75,75-75h0c41.42,0,75,33.58,75,75h0c0,41.42-33.58,75-75,75h0c-41.42,0-75-33.58-75-75ZM439,185c0-41.42,33.58-75,75-75h0c41.42,0,75,33.58,75,75h0c0,41.42-33.58,75-75,75h0c-41.42,0-75-33.58-75-75Z"  />
               </svg>
@@ -300,6 +300,52 @@
         <sp-field-group>
           <sp-label size="s" style="margin-bottom: 5px;">Alt+Click value in pixels</sp-label>
           <sp-textfield type="number" id="o_altClick_featherAmount" width="50px" style="margin-bottom: 10px;" placeholder="15"></sp-textfield>
+        </sp-field-group>
+        
+        <sp-field-group style="margin-top: 15px;">
+          <sp-checkbox size="s" id="useGuidesCheckbox" checked>Apply effect at canvas bounds</sp-checkbox>
+        </sp-field-group>
+
+        <footer class="optionsFooter">
+          <sp-action-group style="display: flex; justify-content: flex-start;">
+            <div style="padding: 10px;">
+            <sp-button id="cancelButton" variant="secondary">
+              Cancel
+            </sp-button>
+            </div>
+            <div style="padding: 10px;">
+            <sp-button id="okButton" variant="">
+              Ok
+            </sp-button>
+            </div>
+          </sp-action-group>
+        </footer>
+
+      </sp-action-group>
+    </div>
+  </sp-body>
+</dialog>
+
+<!------- Smooth Options ------->
+<dialog id="o_smoothSelection">
+  <sp-body>
+    <div class="o_wrapper" id="optionDialogs">
+      <sp-action-group>
+
+        <sp-label size="L">Smooth amount:</sp-label>
+
+        <sp-field-group>
+          <sp-label size="s" style="margin-bottom: 5px;">Value in pixels</sp-label>
+          <sp-textfield type="number" id="o_click_featherAmount" width="50px" style="margin-bottom: 10px;" placeholder="5"></sp-textfield>
+        </sp-field-group>
+
+        <sp-field-group>
+          <sp-label size="s" style="margin-bottom: 5px;">Alt+Click value in pixels</sp-label>
+          <sp-textfield type="number" id="o_altClick_featherAmount" width="50px" style="margin-bottom: 10px;" placeholder="15"></sp-textfield>
+        </sp-field-group>
+        
+        <sp-field-group style="margin-top: 15px;">
+          <sp-checkbox size="s" id="useGuidesCheckbox" checked>Apply effect at canvas bounds</sp-checkbox>
         </sp-field-group>
 
         <footer class="optionsFooter">

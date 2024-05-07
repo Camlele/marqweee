@@ -446,11 +446,11 @@ document
 
 document
 	.getElementById("o_featherButton")
-	.addEventListener("click", () => {openDialog("#o_feather", "Feather selection", 280, 300);});
+	.addEventListener("click", () => {openDialog("#o_feather", "Feather selection", 280, 340);});
 
-// document
-// 	.getElementById("smoothSelectionButton")
-// 	.addEventListener("click", smoothSelectionButton);
+document
+	.getElementById("o_smoothSelectionButton")
+	.addEventListener("click", () => {openDialog("#o_smoothSelection", "Smooth selection", 280, 340);});
 
 document.getElementById("okButton").addEventListener("click", function() {
    res.close('ok');
