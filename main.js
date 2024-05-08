@@ -249,14 +249,6 @@ async function getSelectionBounds() {
 }
 
 async function createSelectionFromBounds(bounds) {
-
-   let canvasBoundsCheckbox = document.getElementById("canvasBoundsCheckbox");
-   let selectionBoundsCheckbox = document.getElementById("selectionBoundsCheckbox");
-   let canvasBounds = canvasBoundsCheckbox.checked;
-   // let selectionBounds = selectionBoundsCheckbox.checked;
-
-   if (canvasBounds = true) {
-
    const { left, top, right, bottom } = bounds;
    await batchPlay(
       [{
@@ -269,19 +261,6 @@ async function createSelectionFromBounds(bounds) {
                left: left,
                right: right
          }
-      }],
-      { synchronousExecution: false, modalBehavior: "execute" }
-   );
-} else {
-   const { left, top, right, bottom } = bounds;
-   await batchPlay(
-      [{
-         _obj: "set",
-         _target: [{ _ref: "channel", _property: "selection" }],
-         to: {
-            _enum: "ordinal",
-            _value: "allEnum"
-         },
       }],
       { synchronousExecution: false, modalBehavior: "execute" }
    );
