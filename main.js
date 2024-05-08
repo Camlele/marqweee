@@ -314,7 +314,6 @@ async function altClickHalveLeft(event) {
       }, { commandName: "Halve Selection Left" });
       }
    }
-   
 
 document
    .getElementById("halveSelectionLeft")
@@ -442,7 +441,6 @@ const openDialog = async (dialogSelector, title, width, height) => {
 	console.log(`The dialog closed with: ${res}`)
 }
 
-
 document
     .getElementById("o_findCenterButton")
     .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 320, 350);});
@@ -463,10 +461,43 @@ document
 	.getElementById("o_smoothSelectionButton")
 	.addEventListener("click", () => {openDialog("#o_smoothSelection", "Smooth selection", 280, 340);});
 
-document.getElementById("okButton").addEventListener("click", function() {
-   res.close('ok');
-});
+const okButton = document.querySelectorAll(".okButton");
+okButton.forEach(okButton => okButton.addEventListener("click", () => {
+   // saveSettings();
+   document.getElementById('o_findCenter').close("Ok");
+   document.getElementById('o_expandShrink').close("Ok");
+   document.getElementById('o_halveSelection').close("Ok");
+   document.getElementById('o_feather').close("Ok");
+   document.getElementById('o_smoothSelection').close("Ok");
+}));
 
-document.getElementById("cancelButton").addEventListener("click", function() {
-   require('uxp').host.closeModal();
-});
+const cancelButton = document.querySelectorAll(".cancelButton");
+cancelButton.forEach(cancelButton => cancelButton.addEventListener("click", () => {
+   // resetSettings();
+   document.getElementById('o_findCenter').close("Cancel");
+   document.getElementById('o_expandShrink').close("Cancel");
+   document.getElementById('o_halveSelection').close("Cancel");
+   document.getElementById('o_feather').close("Cancel");
+   document.getElementById('o_smoothSelection').close("Cancel");
+}));
+
+// if (okButton) {
+//    await saveSettings();
+// } else {
+//    await cancelSettings();
+// }
+
+
+// const okButton = document.getElementById("okButton");
+// okButton.addEventListener("click", (e) => {
+//    onSubmit();
+//    e.preventDefault();
+// });
+
+// document
+//    .getElementById("o_findCenter", "okButton")
+//    .addEventListener("click", () => document.getElementById('o_findCenter').removeAttribute('open')) ;
+
+// document.getElementById("cancelButton").addEventListener("click", function() {
+//    require('uxp').host.closeModal();
+// });
