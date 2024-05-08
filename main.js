@@ -3,10 +3,10 @@
 const uxp = require("uxp");
 const Constants = require('photoshop').constants;
 const app = require('photoshop').app;
-const doc = app.activeDocument;
 const {executeAsModal} = require("photoshop").core;
 const { core } = require('photoshop');
 const {batchPlay} = require("photoshop").action;
+const doc = app.activeDocument;
 
 //------------------------------- select layer bounds ------------------------------------
 
@@ -68,7 +68,7 @@ document
 
 async function findCenter() {
    async function getSelectionBounds() {
-       const idDoc = doc._id;
+      const idDoc = doc._id;
        const result = await batchPlay([
            {
                "_obj": "get",
@@ -100,7 +100,7 @@ async function findCenter() {
        // Check the checkbox states
        const useColorSampler = document.getElementById("useColorSamplerCheckbox").checked;
        const useGuides = document.getElementById("useGuidesCheckbox").checked;
-      //  const usePixel = document.getElementById("usePixelCheckbox").checked
+       const usePixel = document.getElementById("usePixelCheckbox").checked
 
        if (useGuides) {
            doc.guides.add(Constants.Direction.HORIZONTAL, centerY);
@@ -108,8 +108,10 @@ async function findCenter() {
            //await core.performMenuCommand({commandID: 3503}); //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
        }
 
-      //  if (usePixel) {
-      //  }
+       if (usePixel) {
+         let usePixelLayer = await doc.layers.add();
+         usePixelLayer.name = "Centerpoint"
+       }
 
        if (useColorSampler) {
            await batchPlay([
@@ -486,18 +488,3 @@ cancelButton.forEach(cancelButton => cancelButton.addEventListener("click", () =
 // } else {
 //    await cancelSettings();
 // }
-
-
-// const okButton = document.getElementById("okButton");
-// okButton.addEventListener("click", (e) => {
-//    onSubmit();
-//    e.preventDefault();
-// });
-
-// document
-//    .getElementById("o_findCenter", "okButton")
-//    .addEventListener("click", () => document.getElementById('o_findCenter').removeAttribute('open')) ;
-
-// document.getElementById("cancelButton").addEventListener("click", function() {
-//    require('uxp').host.closeModal();
-// });
