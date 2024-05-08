@@ -1,4 +1,4 @@
-## Marqweee!
+# Marqweee!
 
 v1.0.0
 
@@ -10,13 +10,13 @@ Photoshop v22.0.0 or newer
 
 ## Use
 
-##### Select layer bounds:
+### Select layer bounds:
 - Selects the bounds of the active layer, aka the bounds of the art in a layer.
 
 - Useful for:
 	- Masking a layer whose bounds is indeterminate for art asset swapping or similar.
 
-##### Find selection center:
+### Find selection center:
 - Finds the center of a selection and marks it with one or all of the following:
 	- guides
 	- a colour sampler
@@ -28,7 +28,7 @@ Photoshop v22.0.0 or newer
 	- A tangible reference of the center layer for positing or asset placement.
 	- Visual reference for export to other programs like Spine, especially when art is symmetric but not centered in its bounds. 
 
-##### Expand / shrink selection
+### Expand / shrink selection
 - Expands or shrinks the active selection by the user's input (default is 1px).
 - Alt/Option click expands or shrinks the selection by the user's input (default is 5px).
 
@@ -36,21 +36,21 @@ Photoshop v22.0.0 or newer
 	- QOL.
 	- Quick padding or clipping before art export or masking.
 
-##### Halve selection
+### Halve selection
 - Halves the left or top of the active selection or the canvas bounds, depending on user input. 
 - Alt/option click halves the right or bottom half.
 
 - Useful for:
 	- Dividing art into halves or quarters for mirroring
 
-##### Feather selection
+### Feather selection
 - Feathers the active selection by the user's input (default is 5px).
 - Alt/Option click feathers the selection by the user's input (default is 15px).
 
 - Useful for:
 	- QOL.
 
-##### Smooth selection
+### Smooth selection
 - Smooths the active selection by the user's input (default is 5px).
 - Alt/Option click smooths the selection by the user's input (default is 15px).
 
