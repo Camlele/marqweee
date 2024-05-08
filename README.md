@@ -25,7 +25,7 @@ Photoshop v22.5.0 or newer
 - Alt/Option clicking three times removes all centerpoint pixel layers. 
 
 - Useful for:
-	- A tangible reference of the center layer for positing or asset placement.
+	- A tangible reference of the center layer for positioning or asset placement.
 	- Visual reference for export to other programs like Spine, especially when art is symmetric but not centered in its bounds. 
 
 ### Expand / shrink selection
