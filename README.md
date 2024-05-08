@@ -2,7 +2,7 @@
 
 v1.0.0
 
-This is a set of scripts meant to improve workflow or extend the capability of Photoshop's marquee tools.
+This is a set of scripts meant to improve workflow and extend the capability of Photoshop's marquee tools.
 
 ## Compatibility
 
