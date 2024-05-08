@@ -15,7 +15,7 @@
       "type": "panel",
       "id": "mainContent",
       "minimumSize": {
-        "width": 150,
+        "width": 163,
         "height": 300
       },
       "maximumSize": {
@@ -23,11 +23,11 @@
         "height": 2000
       },
       "preferredDockedSize": {
-        "width": 230,
-        "height": 300
+        "width": 163,
+        "height": 350
       },
       "preferredFloatingSize": {
-        "width": 170,
+        "width": 163,
         "height": 350
       },
       "icons": [
