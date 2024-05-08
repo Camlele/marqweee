@@ -258,10 +258,10 @@
         <sp-label style="display: flex;" size="L">Select the left or top half<br> of a selection. Alt click to select<br> the right or bottom half.<br></sp-label>
 
         <sp-label size="L">Default to:</sp-label>
-        <sp-field-group>
-          <sp-checkbox size="s" id="selectionBoundsCheckbox" checked>Active selection</sp-checkbox>
-          <sp-checkbox size="s" id="canvasBoundsCheckbox">Entire canvas</sp-checkbox>
-        </sp-field-group>
+        <sp-radio-group>
+          <sp-radio value="first" size="s" id="selectionBoundsCheckbox" checked>Active selection</sp-radio>
+          <sp-radio value="second" size="s" id="canvasBoundsCheckbox">Entire canvas</sp-radio>
+        </sp-radio-group>
 
       </sp-action-group>
 
