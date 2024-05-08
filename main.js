@@ -9,6 +9,9 @@ const {batchPlay} = require("photoshop").action;
 const doc = app.activeDocument;
 
 //------------------------------- select layer bounds ------------------------------------
+// add select bounds of a layer w/o fx with boundsNoEffects?
+// https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/bounds/
+//
 
 async function selectLayerBounds() {
    async function getActiveLayerBounds() {
@@ -101,6 +104,7 @@ async function findCenter() {
        const useColorSampler = document.getElementById("useColorSamplerCheckbox").checked;
        const useGuides = document.getElementById("useGuidesCheckbox").checked;
        const usePixel = document.getElementById("usePixelCheckbox").checked
+       const alertCoordinates = document.getElementById("alertCoordinatesCheckbox").checked
 
        if (useGuides) {
            doc.guides.add(Constants.Direction.HORIZONTAL, centerY);
@@ -208,6 +212,10 @@ async function findCenter() {
             }
            ], {});
        }
+
+       if (alertCoordinates) {
+         await app.showAlert(`Coordinates are: ${[centerX]} X, ${[centerY]} Y`);
+       }
    } 
 
    await executeAsModal(getSelectionBounds);
@@ -311,32 +319,47 @@ document
 });
 
 //------------------------------- halve selection ------------------------------------
+//link for document reference for full canvas bounds selection
+//https://developer.adobe.com/photoshop/uxp/2022/ps_reference/#document
 
 async function getSelectionBounds() {
-    const result = await batchPlay(
-        [{
-            _obj: "get",
-            _target: [{
-                _property: "selection"
-            }, {
-                _ref: "document",
-                _enum: "ordinal",
-                _value: "targetEnum"
-            }]
-        }], {
-            synchronousExecution: false,
-            modalBehavior: "execute"
-        }
-    );
 
-    const left = result[0].selection.left._value;
-    const top = result[0].selection.top._value;
-    const right = result[0].selection.right._value;
-    const bottom = result[0].selection.bottom._value;
-    const width = right - left;
-    const height = bottom - top;
+   const useActiveSelection = document.getElementById("selectionBoundsCheckbox").checked
+   // const useCanvasBounds = document.getElementById("canvasBoundsCheckbox").checked
 
-    return { left, top, right, bottom, width, height };
+   if (useActiveSelection) {
+
+   const result = await batchPlay(
+      [{
+         _obj: "get",
+         _target: [{
+               _property: "selection"
+         }, {
+               _ref: "document",
+               _enum: "ordinal",
+               _value: "targetEnum"
+         }]
+      }], {
+         synchronousExecution: false,
+         modalBehavior: "execute"
+      }
+   );
+
+   const left = result[0].selection.left._value;
+   const top = result[0].selection.top._value;
+   const right = result[0].selection.right._value;
+   const bottom = result[0].selection.bottom._value;
+   const width = right - left;
+   const height = bottom - top;
+
+   return { left, top, right, bottom, width, height };
+   } else {
+      const left = 0;
+      const right = doc.width;
+      const top = 0;
+      const bottom = doc.width;
+      return { left, top, right, bottom };
+   }
 }
 
 async function createSelectionFromBounds(bounds) {

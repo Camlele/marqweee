@@ -6,7 +6,7 @@ This is a set of scripts meant to improve workflow or extend the capability of P
 
 ## Compatibility
 
-Photoshop v22.0.0 or newer
+Photoshop v22.5.0 or newer
 
 ## Use
 
