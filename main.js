@@ -249,21 +249,42 @@ async function getSelectionBounds() {
 }
 
 async function createSelectionFromBounds(bounds) {
-    const { left, top, right, bottom } = bounds;
-    await batchPlay(
-        [{
-            _obj: "set",
-            _target: [{ _ref: "channel", _property: "selection" }],
-            to: {
-                _obj: "rectangle",
-                top: top,
-                bottom: bottom,
-                left: left,
-                right: right
-            }
-        }],
-        { synchronousExecution: false, modalBehavior: "execute" }
-    );
+
+   let canvasBoundsCheckbox = document.getElementById("canvasBoundsCheckbox");
+   let selectionBoundsCheckbox = document.getElementById("selectionBoundsCheckbox");
+   let canvasBounds = canvasBoundsCheckbox.checked;
+   // let selectionBounds = selectionBoundsCheckbox.checked;
+
+   if (canvasBounds = true) {
+
+   const { left, top, right, bottom } = bounds;
+   await batchPlay(
+      [{
+         _obj: "set",
+         _target: [{ _ref: "channel", _property: "selection" }],
+         to: {
+               _obj: "rectangle",
+               top: top,
+               bottom: bottom,
+               left: left,
+               right: right
+         }
+      }],
+      { synchronousExecution: false, modalBehavior: "execute" }
+   );
+} else {
+   const { left, top, right, bottom } = bounds;
+   await batchPlay(
+      [{
+         _obj: "set",
+         _target: [{ _ref: "channel", _property: "selection" }],
+         to: {
+            _enum: "ordinal",
+            _value: "allEnum"
+         },
+      }],
+      { synchronousExecution: false, modalBehavior: "execute" }
+   );
 }
 
 async function altClickHalveTop(event) {
@@ -330,7 +351,7 @@ document
 
 //------------------------------- feather selection ------------------------------------
 
-async function featherSelection(featherAmount) {
+async function featherSelection(featherAmount, featherCanvasBoundsBool) {
    async function featherBatchPlay() {
       const result = await batchPlay(
          [{
@@ -339,7 +360,7 @@ async function featherSelection(featherAmount) {
                   _unit: "pixelsUnit",
                   _value: featherAmount
                },
-               selectionModifyEffectAtCanvasBounds: false,
+               selectionModifyEffectAtCanvasBounds: featherCanvasBoundsBool,
                _options: {
                   dialogOptions: "dontDisplay"
                }
@@ -353,10 +374,11 @@ async function featherSelection(featherAmount) {
 async function altClickFeather(event) {
     let inputField = document.getElementById("o_click_featherAmount");
     let altInputField = document.getElementById("o_altClick_featherAmount");
+    let featherCanvasBoundsBoolCheckbox = document.getElementById("featherCanvasBoundsBool");
     
     let featherAmountString = event.altKey ? altInputField.value : inputField.value; // bool determines which input to use based on the altKey state
-
     let featherAmount = parseInt(featherAmountString);
+    let featherCanvasBoundsBool = featherCanvasBoundsBoolCheckbox.checked;
 
    //Default values
     if (isNaN(featherAmount)) {
@@ -367,7 +389,7 @@ async function altClickFeather(event) {
         }
     }
     
-    await featherSelection(featherAmount);
+    await featherSelection(featherAmount, featherCanvasBoundsBool);
 }
 
 document
@@ -379,7 +401,7 @@ document
 
 //------------------------------- smooth selection ------------------------------------
 
-async function smoothSelection(smoothAmount) {
+async function smoothSelection(smoothAmount, smoothCanvasBoundsBool) {
    async function smoothBatchPlay() {
       const result = await batchPlay(
          [{
@@ -388,7 +410,7 @@ async function smoothSelection(smoothAmount) {
                   _unit: "pixelsUnit",
                   _value: smoothAmount
                },
-               selectionModifyEffectAtCanvasBounds: false,
+               selectionModifyEffectAtCanvasBounds: smoothCanvasBoundsBool,
                _options: {
                   dialogOptions: "dontDisplay"
                }
@@ -402,10 +424,11 @@ async function smoothSelection(smoothAmount) {
 async function altClickSmooth(event) {
     let inputField = document.getElementById("o_click_smoothAmount");
     let altInputField = document.getElementById("o_altClick_smoothAmount");
+    let smoothCanvasBoundsBoolCheckbox = document.getElementById("smoothCanvasBoundsBool");
     
     let smoothAmountString = event.altKey ? altInputField.value : inputField.value; // bool determines which input to use based on the altKey state
-
     let smoothAmount = parseInt(smoothAmountString);
+    let smoothCanvasBoundsBool = smoothCanvasBoundsBoolCheckbox.checked;
 
    //Default values
     if (isNaN(smoothAmount)) {
@@ -416,7 +439,7 @@ async function altClickSmooth(event) {
         }
     }
     
-    await smoothSelection(smoothAmount);
+    await smoothSelection(smoothAmount, smoothCanvasBoundsBool);
 }
 
 document

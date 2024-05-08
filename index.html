@@ -259,8 +259,8 @@
 
         <sp-label size="L">Default to:</sp-label>
         <sp-field-group>
-          <sp-checkbox size="s" checked>Active selection</sp-checkbox>
-          <sp-checkbox size="s">Entire canvas</sp-checkbox>
+          <sp-checkbox size="s" id="selectionBoundsCheckbox" checked>Active selection</sp-checkbox>
+          <sp-checkbox size="s" id="canvasBoundsCheckbox">Entire canvas</sp-checkbox>
         </sp-field-group>
 
       </sp-action-group>
@@ -303,7 +303,7 @@
         </sp-field-group>
         
         <sp-field-group style="margin-top: 15px;">
-          <sp-checkbox size="s" id="useGuidesCheckbox" checked>Apply effect at canvas bounds</sp-checkbox>
+          <sp-checkbox size="s" id="featherCanvasBoundsBool" checked>Apply effect at canvas bounds</sp-checkbox>
         </sp-field-group>
 
         <footer class="optionsFooter">
@@ -345,7 +345,7 @@
         </sp-field-group>
         
         <sp-field-group style="margin-top: 15px;">
-          <sp-checkbox size="s" id="useGuidesCheckbox" checked>Apply effect at canvas bounds</sp-checkbox>
+          <sp-checkbox size="s" id="smoothCanvasBoundsBool" checked>Apply effect at canvas bounds</sp-checkbox>
         </sp-field-group>
 
         <footer class="optionsFooter">
