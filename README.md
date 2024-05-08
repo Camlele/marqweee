@@ -22,7 +22,7 @@ Photoshop v22.5.0 or newer
 	- a colour sampler
 	- a 2x2 pixel in a new layer
 - Alt/Option click removes all guides and colour samplers
-- Alt/Option clicking twice removes all centerpoint pixel layers. 
+- Alt/Option clicking three times removes all centerpoint pixel layers. 
 
 - Useful for:
 	- A tangible reference of the center layer for positing or asset placement.

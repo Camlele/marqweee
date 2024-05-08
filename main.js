@@ -570,7 +570,7 @@ const openDialog = async (dialogSelector, title, width, height) => {
 
 document
     .getElementById("o_findCenterButton")
-    .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 320, 350);});
+    .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 320, 360);});
 
 document
 	.getElementById("o_expandShrinkButton")
