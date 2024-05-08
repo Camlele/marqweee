@@ -473,6 +473,12 @@ async function altClickFeather(event) {
     let featherAmount = parseInt(featherAmountString);
     let featherCanvasBoundsBool = featherCanvasBoundsBoolCheckbox.checked;
 
+    if (featherCanvasBoundsBoolCheckbox) {
+      featherCanvasBoundsBool = true;
+    } else {
+      featherCanvasBoundsBool = false;
+    }
+
    //Default values
     if (isNaN(featherAmount)) {
         if (event.altKey) {
@@ -522,6 +528,12 @@ async function altClickSmooth(event) {
     let smoothAmountString = event.altKey ? altInputField.value : inputField.value; // bool determines which input to use based on the altKey state
     let smoothAmount = parseInt(smoothAmountString);
     let smoothCanvasBoundsBool = smoothCanvasBoundsBoolCheckbox.checked;
+
+    if (smoothCanvasBoundsBoolCheckbox) {
+      smoothCanvasBoundsBool = true;
+    } else {
+      smoothCanvasBoundsBool = false;
+    }
 
    //Default values
     if (isNaN(smoothAmount)) {
