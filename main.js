@@ -67,6 +67,7 @@ document
 
 //------------------------------- find selection center ------------------------------------
 // Currently only targets the document on which it was activated; needs to target activeDocument
+// same goes for clearing elements, including the pixel layer
 
 
 async function findCenter() {
