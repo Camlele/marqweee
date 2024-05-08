@@ -6,7 +6,7 @@
   "host": [
     {
       "app": "PS",
-      "minVersion": "23.0.0"
+      "minVersion": "22.0.0"
     }
   ],
   "manifestVersion": 5,
@@ -34,7 +34,7 @@
         {
           "width": 32,
           "height": 32,
-          "path": "icons/icon_D.png",
+          "path": "icons/dark.png",
           "scale": [
             1,
             2
@@ -50,7 +50,7 @@
         {
           "width": 32,
           "height": 32,
-          "path": "icons/icon_N.png",
+          "path": "icons/light.png",
           "scale": [
             1,
             2

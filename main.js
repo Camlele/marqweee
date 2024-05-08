@@ -110,8 +110,77 @@ async function findCenter() {
 
        if (usePixel) {
          let usePixelLayer = await doc.layers.add();
-         usePixelLayer.name = "Centerpoint"
-       }
+         usePixelLayer.name = "Selection Centerpoint";
+         const result = await batchPlay(
+            [
+               {
+                  _obj: "make", //Make pixel shape layer
+                  _target: [
+                     {
+                        _ref: "contentLayer"
+                     }
+                  ],
+                  using: {
+                     _obj: "contentLayer",
+                     type: {
+                        _obj: "solidColorLayer",
+                        color: {
+                           _obj: "RGBColor",
+                           red: 0.0038910505827516317,
+                           grain: 255,
+                           blue: 42.509728744626045
+                        }
+                     },
+                     shape: {
+                        _obj: "rectangle",
+                        unitValueQuadVersion: 1,
+                        top: {
+                           _unit: "pixelsUnit",
+                           _value: centerY - 1
+                        },
+                        left: {
+                           _unit: "pixelsUnit",
+                           _value: centerX - 1
+                        },
+                        bottom: {
+                           _unit: "pixelsUnit",
+                           _value: centerY + 1
+                        },
+                        right: {
+                           _unit: "pixelsUnit",
+                           _value: centerX + 1
+                        }
+                     }
+                  },
+                  layerID: 28,
+                  _options: {
+                     dialogOptions: "dontDisplay"
+                  }
+               },
+               {
+                  _obj: "set", //set layer color to green
+                  _target: [
+                     {
+                        _ref: "layer",
+                        _enum: "ordinal",
+                        _value: "targetEnum"
+                     }
+                  ],
+                  to: {
+                     _obj: "layer",
+                     color: {
+                        _enum: "color",
+                        _value: "grain"
+                     }
+                  },
+                  _options: {
+                     dialogOptions: "dontDisplay"
+                     }
+               },
+            ],
+            {}
+         );
+      }
 
        if (useColorSampler) {
            await batchPlay([
@@ -144,8 +213,12 @@ async function findCenter() {
    await executeAsModal(getSelectionBounds);
 }
 
+let altClickCount = 0;
+
 async function altClickCenter(event) {
    if (event.altKey) {
+      altClickCount++;
+      if (altClickCount === 1) {
        await executeAsModal(async () => {
            await batchPlay([{ _obj: "clearAllGuides" }], {});
        }, { commandName: "Clear All Guides" });
@@ -153,9 +226,25 @@ async function altClickCenter(event) {
            await batchPlay([{ _obj: "delete", _target:[{_ref: "colorSampler", _enum: "ordinal", _value: "allEnum"}] }], {});
        }, { commandName: "Clear All ColorSamplers" });
        console.log("All guides were removed");
+
+       setTimeout(() => { //alt double click timer
+         altClickCount = 0; //timer reset
+     }, 800); // double click sens
+
+   } else if (altClickCount === 2) {
+      await executeAsModal(async () => {
+         const allLayers = await doc.layers;
+         const targetLayers = allLayers.filter(layer => layer.name === "Selection Centerpoint");
+         for (const layer of targetLayers) {
+            await layer.delete();
+         }
+      }, {commandName: "Delete pixel layers"});
+      console.log("Selection Centerpoint layers removed");
+      altClickCount = 0; //timer reset
+     }
    } else {
        await findCenter();
-       console.log("Center indicator(s) were placed.")
+       console.log("Center indicator(s) were placed.");
    }
 }
 
