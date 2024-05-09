@@ -1,11 +1,16 @@
 //------------------------------- entrypoints ------------------------------------
 
 const uxp = require("uxp");
+const storage = require("uxp").storage;
+const fs = storage.localFileSystem;
+let data;
+
 const Constants = require('photoshop').constants;
 const app = require('photoshop').app;
 const {executeAsModal} = require("photoshop").core;
 const { core } = require('photoshop');
 const {batchPlay} = require("photoshop").action;
+
 const doc = app.activeDocument;
 
 //------------------------------- select layer bounds ------------------------------------
@@ -71,7 +76,7 @@ document
 
 
 async function findCenter() {
-   async function getSelectionBounds() {
+   async function getSelectionBounds(usePixel) {
       const idDoc = doc._id;
        const result = await batchPlay([
            {
@@ -554,7 +559,8 @@ document
 });
 
 //------------------------------- options dialogs ------------------------------------
-
+// https://forums.creativeclouddeveloper.com/t/how-do-i-read-and-write-to-a-json-file-in-datafolder/1710
+// https://github.com/pklaschka/xd-storage-helper/blob/master/storage-helper.js
 
 const openDialog = async (dialogSelector, title, width, height) => {
 	const res = await document.querySelector(dialogSelector).uxpShowModal({
@@ -565,8 +571,37 @@ const openDialog = async (dialogSelector, title, width, height) => {
 			height: height
 		}
 	})
-	console.log(`The dialog closed with: ${res}`)
+	console.log(`The dialog closed with: ${res}`);
 }
+
+// storage handling
+
+// async function init() {
+//    try {
+//       let returnFile = await dataFolder.getEntry("settings.json");
+//       data = JSON.parse((await returnFile.read({format: storage.formats.utf8})).toString());
+//       return returnFile;
+//    } catch (e) {
+//       const file = await dataFolder.createEntry('settings.json', {type: storage.types.file, overwrite: true});
+//       if (file.isFile) {
+//          await file.write('{}', {append: false});
+//          data = {};
+//          return file;
+//       } else {
+//          throw new Error("Failed to create settings file");
+//       }
+//    }
+// }
+// // reading
+// const dataFile = await this.init();
+// data = JSON.parse((await dataFile.read({format: storage.formats.utf8})).toString());
+
+// // writing
+// const datafile = await this.init();
+// data["key"] = value;
+// return await datafile.write(JSON.stringify(data), {append: false, format: storage.formats.utf8});
+
+
 
 document
     .getElementById("o_findCenterButton")
