@@ -117,20 +117,25 @@ async function findCenter() {
            
       //    async function guidesVisibility() {
       //       const result = await batchPlay(
-      //          [{
-      //             _obj: "get",
-      //             _target: [{
-      //                _property: "guidesVisibility"
-      //             },
+      //          [
       //             {
-      //                _ref: "document",
-      //                _id: app.activeDocument._id
-      //             }
-      //             ]
-      //          }]
+      //                _obj: 'uiInfo',
+      //                _target: {
+      //                  _ref: 'application',
+      //                  _enum: 'ordinal',
+      //                  _value: 'targetEnum',
+      //                },
+      //                command: 'getCommandEnabled',
+      //                commandID: 3503,
+      //              }
+      //          ]
       //       )
-      //    } await executeAsModal(guidesVisibility, {"commandName": "Get guide visibility"});
-       }
+      //      await executeAsModal(guidesVisibility, {"commandName": "Get guide visibility"});
+      //      return result;
+      //  }
+      //  const result = await guidesVisibility();
+      //  console.log(result);
+      }
 
        if (usePixel) {
          let usePixelLayer = await app.activeDocument.layers.add();
