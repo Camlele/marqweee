@@ -108,9 +108,28 @@ async function findCenter() {
        const alertCoordinates = document.getElementById("alertCoordinatesCheckbox").checked
 
        if (useGuides) {
-           app.activeDocument.guides.add(Constants.Direction.HORIZONTAL, centerY);
-           app.activeDocument.guides.add(Constants.Direction.VERTICAL, centerX);
-           //await core.performMenuCommand({commandID: 3503}); //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
+         // if (guidesVisibility(result)) {
+         // console.log(guidesVisibility(result));
+         // await core.performMenuCommand({commandID: 3503}); //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
+         // }  
+         app.activeDocument.guides.add(Constants.Direction.HORIZONTAL, centerY);
+         app.activeDocument.guides.add(Constants.Direction.VERTICAL, centerX);
+           
+      //    async function guidesVisibility() {
+      //       const result = await batchPlay(
+      //          [{
+      //             _obj: "get",
+      //             _target: [{
+      //                _property: "guidesVisibility"
+      //             },
+      //             {
+      //                _ref: "document",
+      //                _id: app.activeDocument._id
+      //             }
+      //             ]
+      //          }]
+      //       )
+      //    } await executeAsModal(guidesVisibility, {"commandName": "Get guide visibility"});
        }
 
        if (usePixel) {
@@ -551,6 +570,84 @@ document
    .addEventListener("click", function(event) {
       altClickSmooth(event);
 });
+
+//------------------------------- Create selection from guides ------------------------------------
+
+// async function getGuideHorizontal() {
+//       const result = await batchPlay(
+//          [
+//             {
+//                _obj: "get",
+//                new: {
+//                   _obj: "good",
+//                   position: {
+//                      _unit: "pixelsUnit",
+//                      _value: 967.3493585925512
+//                   },
+//                   orientation: {
+//                      _enum: "orientation",
+//                      _value: "vertical"
+//                   },
+//                   kind: {
+//                      _enum: "kind",
+//                      _value: "document"
+//                   },
+//                   _target: [
+//                      {
+//                         _ref: "document",
+//                         _id: 134
+//                      },
+//                      {
+//                         _ref: "good",
+//                         _index: 2
+//                      }
+//                   ],
+//                   $GdCA: 0,
+//                   $GdCR: 74,
+//                   $GdCG: 255,
+//                   $GdCB: 255
+//                },
+//                _target: [
+//                   {
+//                      _ref: "good"
+//                   }
+//                ],
+//                guideTarget: {
+//                   _enum: "guideTarget",
+//                   _value: "guideTargetCanvas"
+//                },
+//                _options: {
+//                   dialogOptions: "dontDisplay"
+//                }
+//             }
+//          ],
+//          {}
+//       );
+// } console.log(getGuideHorizontal());
+
+
+// Logic
+
+// MakeSelectionFromGuide(guide[value]); {
+//    if (guideToggleOn) {
+//       if (guide.HORIZONTAL) {
+//          get.guide.HORIZONTAL.value;
+//          if (selectionExists) {
+//             subtractFromSelection(guide.HORIZONTAL.value);
+//          } else {
+//             makeSelectionFrom(guide.HORIZONTAL.value);
+//          }
+//       } else if (guide.VERTICAL) {
+//          get.VERTICAL.value;
+//          if (selectionExists) {
+//             subtractFromSelection(guide.VERTICAL.value);
+//          } else {
+//             makeSelectionFrom(guide.VERTICAL.value);
+//          }
+//       }
+//    }
+// }
+
 
 //------------------------------- options dialogs ------------------------------------
 
