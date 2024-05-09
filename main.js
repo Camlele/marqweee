@@ -10,8 +10,6 @@ const {executeAsModal} = require("photoshop").core;
 const { core } = require('photoshop');
 const {batchPlay} = require("photoshop").action;
 
-const doc = app.activeDocument;
-
 //------------------------------- select layer bounds ------------------------------------
 // add select bounds of a layer w/o fx with boundsNoEffects?
 // https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/bounds/
@@ -75,7 +73,6 @@ document
 
 async function findCenter() {
    async function getSelectionBounds() {
-      const idDoc = doc._id;
        const result = await batchPlay([
            {
                "_obj": "get",
@@ -86,7 +83,7 @@ async function findCenter() {
                    "_ref": "document",
                    "_enum": "ordinal",
                    "_value": "targetEnum",
-                   "_id": idDoc
+                   "_id": app.activeDocument._id
                }]
            }], {
                "synchronousExecution": false
@@ -111,13 +108,13 @@ async function findCenter() {
        const alertCoordinates = document.getElementById("alertCoordinatesCheckbox").checked
 
        if (useGuides) {
-           doc.guides.add(Constants.Direction.HORIZONTAL, centerY);
-           doc.guides.add(Constants.Direction.VERTICAL, centerX);
+           app.activeDocument.guides.add(Constants.Direction.HORIZONTAL, centerY);
+           app.activeDocument.guides.add(Constants.Direction.VERTICAL, centerX);
            //await core.performMenuCommand({commandID: 3503}); //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
        }
 
        if (usePixel) {
-         let usePixelLayer = await doc.layers.add();
+         let usePixelLayer = await app.activeDocument.layers.add();
          usePixelLayer.name = "Selection Centerpoint";
          const result = await batchPlay(
             [
@@ -245,7 +242,7 @@ async function altClickCenter(event) {
 
    } else if (altClickCount === 2) {
       await executeAsModal(async () => {
-         const allLayers = await doc.layers;
+         const allLayers = await app.activeDocument.layers;
          const targetLayers = allLayers.filter(layer => layer.name === "Selection Centerpoint");
          for (const layer of targetLayers) {
             await layer.delete();
@@ -358,9 +355,9 @@ async function getSelectionBounds() {
    return { left, top, right, bottom, width, height };
    } else {
       const left = 0;
-      const right = doc.width;
+      const right = app.activeDocument.width;
       const top = 0;
-      const bottom = doc.width;
+      const bottom = app.activeDocument.width;
       return { left, top, right, bottom };
    }
 }
