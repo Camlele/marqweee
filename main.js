@@ -2,8 +2,7 @@
 
 const uxp = require("uxp");
 const storage = require("uxp").storage;
-const fs = storage.localFileSystem;
-let data;
+const { entrypoints } = require("uxp");
 
 const Constants = require('photoshop').constants;
 const app = require('photoshop').app;
@@ -16,7 +15,6 @@ const doc = app.activeDocument;
 //------------------------------- select layer bounds ------------------------------------
 // add select bounds of a layer w/o fx with boundsNoEffects?
 // https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/bounds/
-//
 
 async function selectLayerBounds() {
    async function getActiveLayerBounds() {
@@ -76,7 +74,7 @@ document
 
 
 async function findCenter() {
-   async function getSelectionBounds(usePixel) {
+   async function getSelectionBounds() {
       const idDoc = doc._id;
        const result = await batchPlay([
            {
@@ -331,7 +329,6 @@ document
 async function getSelectionBounds() {
 
    const useActiveSelection = document.getElementById("selectionBoundsCheckbox").checked
-   // const useCanvasBounds = document.getElementById("canvasBoundsCheckbox").checked
 
    if (useActiveSelection) {
 
@@ -559,11 +556,58 @@ document
 });
 
 //------------------------------- options dialogs ------------------------------------
-// https://forums.creativeclouddeveloper.com/t/how-do-i-read-and-write-to-a-json-file-in-datafolder/1710
-// https://github.com/pklaschka/xd-storage-helper/blob/master/storage-helper.js
+
+let savedFindCenterSettings = JSON.parse(localStorage.getItem("findCenterSettings")) || {
+   useGuides: false,
+   usePixel: true,
+   useColorSampler: false,
+   alertCoordinates: false};
+
+let savedExpandShrinkSettings = JSON.parse(localStorage.getItem("expandShrinkSettings")) || {
+   expandAmount: 1,
+   altExpandAmount: 5,
+   shrinkAmount: 1,
+   altShrinkAmount: 5
+};
+let savedHalveSelectionSettings = JSON.parse(localStorage.getItem("halveSelectionSettings")) || {
+   selectionBounds: true};
+let savedFeatherAmountSettings = JSON.parse(localStorage.getItem("featherAmountSettings")) || {
+   featherAmount: 5,
+   altFeatherAmount: 15,
+   featherCanvasBounds: true};
+let savedSmoothAmountSettings = JSON.parse(localStorage.getItem("smoothAmountSettings")) || {
+   smoothAmount: 5, 
+   altSmoothAmount: 15, 
+   smoothCanvasBounds: true 
+};
+
 
 const openDialog = async (dialogSelector, title, width, height) => {
-	const res = await document.querySelector(dialogSelector).uxpShowModal({
+
+document.getElementById("useColorSamplerCheckbox").checked = savedFindCenterSettings.useColorSampler;
+document.getElementById("useGuidesCheckbox").checked = savedFindCenterSettings.useGuides; 
+document.getElementById("usePixelCheckbox").checked = savedFindCenterSettings.usePixel;
+document.getElementById("alertCoordinatesCheckbox").checked = savedFindCenterSettings.alertCoordinates;
+
+document.getElementById("o_click_expandAmount").value = savedExpandShrinkSettings.expandAmount;
+document.getElementById("o_altClick_expandAmount").value = savedExpandShrinkSettings.altExpandAmount;
+document.getElementById("o_click_contractAmount").value = savedExpandShrinkSettings.shrinkAmount;
+document.getElementById("o_altClick_contractAmount").value = savedExpandShrinkSettings.altShrinkAmount;
+
+document.getElementById("selectionBoundsCheckbox").checked = savedHalveSelectionSettings.selectionBounds;
+document.getElementById("canvasBoundsCheckbox").checked = !savedHalveSelectionSettings.selectionBounds;
+
+document.getElementById("o_click_smoothAmount").value = savedSmoothAmountSettings.smoothAmount;
+document.getElementById("o_altClick_smoothAmount").value = savedSmoothAmountSettings.altSmoothAmount;
+document.getElementById("smoothCanvasBoundsBool").checked = savedSmoothAmountSettings.smoothCanvasBounds;
+
+document.getElementById("o_click_featherAmount").value = savedFeatherAmountSettings.featherAmount;
+document.getElementById("o_altClick_featherAmount").value = savedFeatherAmountSettings.altFeatherAmount;
+document.getElementById("featherCanvasBoundsBool").checked = savedFeatherAmountSettings.featherCanvasBounds;
+
+
+
+const res = await document.querySelector(dialogSelector).uxpShowModal({
 		title: title,
 		resize: "none", // "horizontal", "vertical", "none", "both"
 		size: {
@@ -573,33 +617,6 @@ const openDialog = async (dialogSelector, title, width, height) => {
 	})
 	console.log(`The dialog closed with: ${res}`);
 }
-
-// storage handling
-
-// async function init() {
-//    try {
-//       let returnFile = await dataFolder.getEntry("settings.json");
-//       data = JSON.parse((await returnFile.read({format: storage.formats.utf8})).toString());
-//       return returnFile;
-//    } catch (e) {
-//       const file = await dataFolder.createEntry('settings.json', {type: storage.types.file, overwrite: true});
-//       if (file.isFile) {
-//          await file.write('{}', {append: false});
-//          data = {};
-//          return file;
-//       } else {
-//          throw new Error("Failed to create settings file");
-//       }
-//    }
-// }
-// // reading
-// const dataFile = await this.init();
-// data = JSON.parse((await dataFile.read({format: storage.formats.utf8})).toString());
-
-// // writing
-// const datafile = await this.init();
-// data["key"] = value;
-// return await datafile.write(JSON.stringify(data), {append: false, format: storage.formats.utf8});
 
 
 
@@ -624,8 +641,34 @@ document
 	.addEventListener("click", () => {openDialog("#o_smoothSelection", "Smooth selection", 280, 340);});
 
 const okButton = document.querySelectorAll(".okButton");
-okButton.forEach(okButton => okButton.addEventListener("click", () => {
-   // saveSettings();
+okButton.forEach(button => button.addEventListener("click", () => {
+
+      savedFindCenterSettings.useColorSampler = document.getElementById("useColorSamplerCheckbox").checked;
+      savedFindCenterSettings.useGuides = document.getElementById("useGuidesCheckbox").checked;
+      savedFindCenterSettings.usePixel = document.getElementById("usePixelCheckbox").checked;
+      savedFindCenterSettings.alertCoordinates = document.getElementById("alertCoordinatesCheckbox").checked;
+      localStorage.setItem('findCenterSettings', JSON.stringify(savedFindCenterSettings));
+      
+      savedExpandShrinkSettings.expandAmount = document.getElementById("o_click_expandAmount").value;
+      savedExpandShrinkSettings.altExpandAmount = document.getElementById("o_altClick_expandAmount").value;
+      savedExpandShrinkSettings.shrinkAmount = document.getElementById("o_click_contractAmount").value;
+      savedExpandShrinkSettings.altShrinkAmount = document.getElementById("o_altClick_contractAmount").value;
+      localStorage.setItem('expandShrinkSettings', JSON.stringify(savedExpandShrinkSettings));
+   
+      savedHalveSelectionSettings.selectionBounds = document.getElementById("selectionBoundsCheckbox").checked;
+      localStorage.setItem('halveSelectionSettings', JSON.stringify(savedHalveSelectionSettings));
+
+      savedSmoothAmountSettings.smoothAmount = document.getElementById("o_click_smoothAmount").value;
+      savedSmoothAmountSettings.altSmoothAmount = document.getElementById("o_altClick_smoothAmount").value;
+      savedSmoothAmountSettings.smoothCanvasBounds = document.getElementById("smoothCanvasBoundsBool").checked;
+      localStorage.setItem('smoothAmountSettings', JSON.stringify(savedSmoothAmountSettings));
+
+      savedFeatherAmountSettings.featherAmount = document.getElementById("o_click_featherAmount").value;
+      savedFeatherAmountSettings.altFeatherAmount = document.getElementById("o_altClick_featherAmount").value;
+      savedFeatherAmountSettings.featherCanvasBounds = document.getElementById("featherCanvasBoundsBool").checked;
+      localStorage.setItem('featherAmountSettings', JSON.stringify(savedFeatherAmountSettings));
+
+
    document.getElementById('o_findCenter').close("Ok");
    document.getElementById('o_expandShrink').close("Ok");
    document.getElementById('o_halveSelection').close("Ok");
@@ -634,8 +677,29 @@ okButton.forEach(okButton => okButton.addEventListener("click", () => {
 }));
 
 const cancelButton = document.querySelectorAll(".cancelButton");
-cancelButton.forEach(cancelButton => cancelButton.addEventListener("click", () => {
-   // resetSettings();
+cancelButton.forEach(button => button.addEventListener("click", () => {
+
+      document.getElementById("useColorSamplerCheckbox").checked = savedFindCenterSettings.useColorSampler;
+      document.getElementById("useGuidesCheckbox").checked = savedFindCenterSettings.useGuides;
+      document.getElementById("usePixelCheckbox").checked = savedFindCenterSettings.usePixel;
+      document.getElementById("alertCoordinatesCheckbox").checked = savedFindCenterSettings.alertCoordinates;
+
+      document.getElementById("o_click_expandAmount").value = savedExpandShrinkSettings.expandAmount;
+      document.getElementById("o_altClick_expandAmount").value = savedExpandShrinkSettings.altExpandAmount;
+      document.getElementById("o_click_contractAmount").value = savedExpandShrinkSettings.shrinkAmount;
+      document.getElementById("o_altClick_contractAmount").value = savedExpandShrinkSettings.altShrinkAmount;
+
+      document.getElementById("selectionBoundsCheckbox").checked = savedHalveSelectionSettings.selectionBounds;
+      document.getElementById("canvasBoundsCheckbox").checked = !savedHalveSelectionSettings.selectionBounds;
+
+      document.getElementById("o_click_smoothAmount").value = savedSmoothAmountSettings.smoothAmount;
+      document.getElementById("o_altClick_smoothAmount").value = savedSmoothAmountSettings.altSmoothAmount;
+      document.getElementById("smoothCanvasBoundsBool").checked = savedSmoothAmountSettings.smoothCanvasBounds;
+
+      document.getElementById("o_click_featherAmount").value = savedFeatherAmountSettings.featherAmount;
+      document.getElementById("o_altClick_featherAmount").value = savedFeatherAmountSettings.altFeatherAmount;
+      document.getElementById("featherCanvasBoundsBool").checked = savedFeatherAmountSettings.featherCanvasBounds;
+
    document.getElementById('o_findCenter').close("Cancel");
    document.getElementById('o_expandShrink').close("Cancel");
    document.getElementById('o_halveSelection').close("Cancel");
@@ -643,8 +707,24 @@ cancelButton.forEach(cancelButton => cancelButton.addEventListener("click", () =
    document.getElementById('o_smoothSelection').close("Cancel");
 }));
 
-// if (okButton) {
-//    await saveSettings();
-// } else {
-//    await cancelSettings();
+// entrypoints.setup({
+//    commands: {resetPreferences: () => resetPreferences()
+//    },
+//    panels: {
+//       main: {
+//          menuItems: [
+//             {id: "resetPreferences", 
+//             label: "Reset to default settings", 
+//             checked: false, 
+//             enabled: true,
+//             function: () => resetPreferences()}
+//             ]
+//          }
+//       }
+//    }
+// );
+
+// async function resetPreferences() {
+//    await localStorage.delete();
+//    await location.reload();
 // }
