@@ -630,7 +630,7 @@ async function getLastGuideInfo() {
       return { guideOrientation, guidePosition, guideIndex };
 }
 
-async function SelectionExists() {
+async function getSelection() {
    const result = await batchPlay(
       [{
          _obj: "get",
@@ -647,14 +647,19 @@ async function SelectionExists() {
       }
       
    ); 
+   selectionExists = result[0].selection != undefined;
+
+   if (!selectionExists) {
+      return { left: null, top: null, right: null, bottom: null, selectionExists };
+   }
+
    let left = result[0].selection.left._value;
    let top = result[0].selection.top._value;
    let right = result[0].selection.right._value;
-   let bottom = result[0].selection.bottom._value;
-
-   let selectionExists = ( left == undefined && top == undefined && right == undefined && bottom == undefined ) ? false : true;
+   let bottom = result[0].selection.bottom._value; 
 
    return { left, top, right, bottom, selectionExists };  
+
 }
 
 async function subtractFromSelection() {
@@ -662,14 +667,12 @@ async function subtractFromSelection() {
 } 
 
 async function MakeSelectionFromGuide(guideOrientation, selectionExists) {
-   const g = getLastGuideInfo();
-   const s = SelectionExists();
+   getLastGuideInfo();
+   getSelection();
    
-   if (guideOrientation == "horizontal" && selectionExists == true) {
-      console.log("selection exists");
-   } else {
-      console.log("selection doesn't exist");
-   }
+   
+   console.log(guideOrientation, selectionExists);
+   
 }
 
 
