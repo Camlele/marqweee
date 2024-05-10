@@ -110,12 +110,12 @@ async function findCenter() {
        if (useGuides) {
          // if (guidesVisibility(result)) {
          // console.log(guidesVisibility(result));
-         // await core.performMenuCommand({commandID: 3503}); //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
+         // await core.performMenuCommand({commandID: 3503});   //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
          // }  
          app.activeDocument.guides.add(Constants.Direction.HORIZONTAL, centerY);
          app.activeDocument.guides.add(Constants.Direction.VERTICAL, centerX);
            
-      //    async function guidesVisibility() {
+      //    async function guidesVisibility() {    // this should output a batchPlay ID and a bool indicating whether or not guides are visible, but it's not working
       //       const result = await batchPlay(
       //          [
       //             {
@@ -135,6 +135,7 @@ async function findCenter() {
       //  }
       //  const result = await guidesVisibility();
       //  console.log(result);
+
       }
 
        if (usePixel) {
@@ -578,57 +579,94 @@ document
 
 //------------------------------- Create selection from guides ------------------------------------
 
-// async function getGuideHorizontal() {
-//       const result = await batchPlay(
-//          [
-//             {
-//                _obj: "get",
-//                new: {
-//                   _obj: "good",
-//                   position: {
-//                      _unit: "pixelsUnit",
-//                      _value: 967.3493585925512
-//                   },
-//                   orientation: {
-//                      _enum: "orientation",
-//                      _value: "vertical"
-//                   },
-//                   kind: {
-//                      _enum: "kind",
-//                      _value: "document"
-//                   },
-//                   _target: [
-//                      {
-//                         _ref: "document",
-//                         _id: 134
-//                      },
-//                      {
-//                         _ref: "good",
-//                         _index: 2
-//                      }
-//                   ],
-//                   $GdCA: 0,
-//                   $GdCR: 74,
-//                   $GdCG: 255,
-//                   $GdCB: 255
-//                },
-//                _target: [
-//                   {
-//                      _ref: "good"
-//                   }
-//                ],
-//                guideTarget: {
-//                   _enum: "guideTarget",
-//                   _value: "guideTargetCanvas"
-//                },
-//                _options: {
-//                   dialogOptions: "dontDisplay"
-//                }
-//             }
-//          ],
-//          {}
-//       );
-// } console.log(getGuideHorizontal());
+async function getLastGuideInfo() {
+        const guidesResult = await batchPlay(
+         [{
+               _obj: "multiGet",
+               _target: [{ 
+                  _ref: "document", 
+                  _id: app.activeDocument._id 
+               }],
+               extendedReference: [[
+                     "orientation",
+                     "position",
+                     "layerID",
+                     "count",
+                     "ID",
+                     "itemIndex",
+                     "kind"
+                  ],
+                  {_obj: "guide", 
+                  index: 1, 
+                  count: -1
+               }],                
+               options: {
+                  failOnMissingProperty: false,
+                  failOnMissingElement: true
+               },
+               _options: {
+                  dialogOptions: "dontDisplay"
+               }
+            }
+         ],
+         {}
+      );
+      let guideIndex = guidesResult[0].list.reduce((max, guide) =>
+         guide.itemIndex > max.itemIndex ? guide : max, guidesResult[0].list[0]); //gets highest index guide
+
+      let guideOrientation = guideIndex.orientation._value;
+      let guidePosition = guideIndex.position._value;
+  
+      return { guideOrientation, guidePosition, guideIndex };
+}
+
+async function SelectionExists() {
+   const result = await batchPlay(
+      [{
+         _obj: "get",
+         _target: [{
+               _property: "selection"
+         }, {
+               _ref: "document",
+               _enum: "ordinal",
+               _value: "targetEnum"
+         }]
+      }], {
+         synchronousExecution: false,
+         modalBehavior: "execute"
+      }
+      
+   ); 
+   let left = result[0].selection.left._value;
+   let top = result[0].selection.top._value;
+   let right = result[0].selection.right._value;
+   let bottom = result[0].selection.bottom._value;
+
+   let selectionExists = ( left == undefined && top == undefined && right == undefined && bottom == undefined ) ? false : true;
+
+   return { left, top, right, bottom, selectionExists };  
+}
+
+async function subtractFromSelection() {
+   console.log("selection exists");
+} 
+
+async function MakeSelectionFromGuide(guideOrientation, selectionExists) {
+   const g = getLastGuideInfo();
+   const s = SelectionExists();
+   
+   if (guideOrientation == "horizontal" && selectionExists == true) {
+      console.log("selection exists");
+   } else {
+      console.log("selection doesn't exist");
+   }
+}
+
+
+        
+
+
+
 
 
 // Logic
