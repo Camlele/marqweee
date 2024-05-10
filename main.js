@@ -207,6 +207,16 @@ async function findCenter() {
                      dialogOptions: "dontDisplay"
                      }
                },
+               {
+                  _obj: "select",
+                  _target: [
+                     {
+                        _ref: "layer",
+                        _enum: "ordinal",
+                        _value: "backwardEnum"
+                     }
+                  ]
+               }
             ],
             {}
          );
