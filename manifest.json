@@ -9,6 +9,9 @@
       "minVersion": "22.5.0"
     }
   ],
+  "featureFlags": {
+    "enableSWCSupport": true
+  },
   "manifestVersion": 5,
   "entrypoints": [
     {
