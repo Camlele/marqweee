@@ -1,24 +1,3 @@
-/* @media (min-width: 610px) {
-  
-   .wrapper {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: row;
-    padding: 12px;
-    overflow: scroll;
-  }
-  sp-action-group {
-    padding: 12px;
-  }
-  sp-label {
-    display: none;
-  }
-} */
-
-
 body {
     color: white;
     padding: 0 16px;
@@ -186,10 +165,7 @@ body {
     flex: 0 0 auto;
     background-color: rgba(0,0,0,0.5);
     border-radius: 4px;
-    /* padding: 24px 12px 12px 12px; */
-    /* position: relative; */
     margin-top: 1em;
-    /* margin-bottom: 12px; */
 }
 #sp-native-tab-page .group {
   background-color: transparent;
@@ -212,10 +188,6 @@ body {
   .group > sp-label:not(.safe) {
     background-color: #E8E8E8;
   }
-}
-
-.group > :not(sp-label) {
-  /* margin: 6px; */
 }
 
 /* icons */

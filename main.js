@@ -1,10 +1,3 @@
-// Written by Jon Westwood for Mahi Gaming BC Studio
-// Requires Photoshop 22.5.0 minimum
-
-// current issues:
-   // when top guide is drawn immediately after bottom guide selection, it selects bounds from the bottom instead of the top
-
-
 //------------------------------- entrypoints ------------------------------------
 
 const uxp = require("uxp");
@@ -19,8 +12,6 @@ const { batchPlay } = require("photoshop").action;
 const Constants = require('photoshop').constants;
 
 //------------------------------- select layer bounds ------------------------------------
-// add select bounds of a layer w/o fx with boundsNoEffects?
-// https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/bounds/
 
 async function selectLayerBounds(event) {
 
@@ -91,38 +82,6 @@ document
 
 
 //------------------------------- find selection center ------------------------------------
-// if (guidesVisibility(result)) {
-// console.log(guidesVisibility(result));
-// await core.performMenuCommand({commandID: 3503});   //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
-// }
-
-// async function guidesVisibility() {    // this should output a batchPlay ID and a bool indicating whether or not guides are visible, but result returns undefined
-//    await executeAsModal(async () => {
-//             const result = await batchPlay([{
-//                      _obj: 'uiInfo',
-//                      _target: {
-//                        _ref: 'application',
-//                        _enum: 'ordinal',
-//                        _value: 'targetEnum',
-//                      },
-//                      command: 'getMenuCommandState',
-//                      commandID: 3503,
-//                    }],
-//                    { synchronousExecution: false, modalBehavior: "execute" }
-               
-//             );
-//            return result;
-//          });
-//        }
-
-
-// async function guidesVisibility() {   // guide visibility bool -- returns true no matter what right now...
-//    return await executeAsModal(async () => {
-//        const result = await core.getMenuCommandState({ commandID: 3503 });
-//        return result;
-//    });
-// }
-
 
 async function findCenter() {
   async function getSelectionBounds() {
@@ -389,8 +348,6 @@ document
 });
 
 //------------------------------- halve selection ------------------------------------
-//link for document reference for full canvas bounds selection
-//https://developer.adobe.com/photoshop/uxp/2022/ps_reference/#document
 
 async function getSelectionBounds() {
 
@@ -863,90 +820,6 @@ async function makeSelectionFromGuide() {
        });
    });
 }
-
-
-
-// Pseudocode logic
-
-
-// function getLastGuideInfo() {
-//    guide result = batchPlay(
-//       get guide info;
-//    )
-//    if (guide index) = latest index {
-//       let guideLastPosition;
-//    } else if (guide index = second latest index) {
-//       let guideSecondLastPosition;
-//    }
-//    return { guideOrientation, guideLastPosition, guideSecondLastPosition };
-// }
-
-// function MakeSelectionFromGuide() {
-//    getLastGuideInfo().then(({ guideOrientation, guideLastPosition, guideSecondLastPosition }) => {
-//       if (guideOrientation == "vertical" && guideLastPosition != undefined && guideSecondLastPosition == undefined) {
-//          result = batchPlay(
-//             set selection to
-//             top: 0,
-//             left: 0,
-//             bottom: document.height,
-//             right: guideLastPosition
-//          );
-//          await deleteLastGuide();
-//       } else if (guideOrientation == "horizontal" && guideLastPosition != undefined && guideSecondLastPosition == undefined) {
-//          result = batchPlay(
-//             set selection to
-//             top: 0,
-//             left: 0,
-//             bottom: guideLastPosition,
-//             right: document.width
-//          );
-//          await deleteLastGuide();
-//       } else if (guideOrientation == "vertical" && guideSecondLastPosition != undefined) {
-//          result = batchPlay(
-//             set selection to
-//             top: 0,
-//             left: guideLastPosition,
-//             bottom: document.height,
-//             right: guideSecondLastPosition
-//          );
-//          await deleteLastGuide();
-//       } else if (guideOrientation == "horizontal" && guideSecondLastPosition != undefined) {
-//          result = batchPlay(
-//             set selection to
-//             top: guideLastPosition,
-//             left: 0,
-//             bottom: guideSecondLastPosition,
-//             right: document.width
-//          );
-//          await deleteLastGuide();
-//       } else if (guideOrientation == undefined || guidePosition == undefined || guideSecondLastPosition == undefined) {
-//          console.log("No guides found");
-//       }
-//    });
-// }
-
-
-
-
-// MakeSelectionFromGuide(guide[value]); {
-//    if (guideToggleOn) {
-//       if (guide.HORIZONTAL) {
-//          get.guide.HORIZONTAL.value;
-//          if (selectionExists) {
-//             subtractFromSelection(guide.HORIZONTAL.value);
-//          } else {
-//             makeSelectionFrom(guide.HORIZONTAL.value);
-//          }
-//       } else if (guide.VERTICAL) {
-//          get.VERTICAL.value;
-//          if (selectionExists) {
-//             subtractFromSelection(guide.VERTICAL.value);
-//          } else {
-//             makeSelectionFrom(guide.VERTICAL.value);
-//          }
-//       }
-//    }
-// }
 
 
 //------------------------------- options dialogs ------------------------------------

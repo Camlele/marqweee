@@ -1,3 +1,13 @@
+<!--  Written by Jon Westwood for Mahi Gaming BC Studio
+  
+      Requires Photoshop 22.5.0 minimum
+
+      Current issues:
+        when top guide is drawn immediately after bottom guide selection, 
+        it selects bounds from the bottom instead of the top 
+-->
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -154,17 +164,11 @@
         </sp-action-group>
 
         <!--Selection from guides-->
-        
         <sp-action-group title="">
          <div class="group">
-          <sp-checkbox id="guideCheckbox" style="display: flex; justify-content: space-evenly;" size="L" style="margin-left: 5px;" title="Creates a selection from the last created guide to the edge of the canvas"><sp-label>Guides to selection</sp-label></sp-checkbox>
-</div>
-          <!-- <sp-action-button label="Edit" id="o_smoothSelectionButton" title="Options">
-            <div slot="icon" class="icon">
-              <svg id="a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><path d="M439,785c0-41.42,33.58-75,75-75h0c41.42,0,75,33.58,75,75h0c0,41.42-33.58,75-75,75h0c-41.42,0-75-33.58-75-75ZM439,485c0-41.42,33.58-75,75-75h0c41.42,0,75,33.58,75,75h0c0,41.42-33.58,75-75,75h0c-41.42,0-75-33.58-75-75ZM439,185c0-41.42,33.58-75,75-75h0c41.42,0,75,33.58,75,75h0c0,41.42-33.58,75-75,75h0c-41.42,0-75-33.58-75-75Z"  />
-              </svg>
-            </div> -->
-
+          <sp-checkbox id="guideCheckbox" style="display: flex; justify-content: space-evenly;" size="L" style="margin-left: 5px;" title="Creates a selection from the last created guide to the edge of the canvas">
+          <sp-label>Guides to selection</sp-label>
+          </sp-checkbox>
         </sp-action-group>
       </div>
   </sp-body>
