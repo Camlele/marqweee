@@ -1,7 +1,7 @@
 {
-  "id": "marqweee v1.1",
-  "name": "Marqweee! v1.1",
-  "version": "1.1.0",
+  "id": "marqweee",
+  "name": "Marqweee!",
+  "version": "1.0.0",
   "main": "index.html",
   "host": [
     {

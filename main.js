@@ -22,20 +22,43 @@ const Constants = require('photoshop').constants;
 // add select bounds of a layer w/o fx with boundsNoEffects?
 // https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/bounds/
 
-async function selectLayerBounds() {
-   async function getActiveLayerBounds() {
-      const result = await batchPlay([{
-            _obj: "get",
-            _target: [
-            { _property: "bounds" },
-            { _ref: "layer", _enum: "ordinal", _value: "targetEnum" }
-            ],
-            _options: { dialogOptions: "dontDisplay" }
-         }],
-         { synchronousExecution: false, modalBehavior: "execute" }
-      ); return result[0].bounds;
-   };
-   
+async function selectLayerBounds(event) {
+
+   const useBoundsNoEffects = !event.altKey;
+   const useBounds = event.altKey;
+
+   let getActiveLayerBounds;
+
+   if (useBounds) {
+      getActiveLayerBounds = async () => {
+         const result = await batchPlay([{
+               _obj: "get",
+               _target: [
+               { _property: "boundsNoEffects" },
+               { _ref: "layer", _enum: "ordinal", _value: "targetEnum" }
+               ],
+               _options: { dialogOptions: "dontDisplay" }
+            }],
+            { synchronousExecution: false, modalBehavior: "execute" }
+         );
+         return result[0].boundsNoEffects;
+      };
+   } else if (useBoundsNoEffects) {
+      getActiveLayerBounds = async () => {
+         const result = await batchPlay([{
+               _obj: "get",
+               _target: [
+               { _property: "bounds" },
+               { _ref: "layer", _enum: "ordinal", _value: "targetEnum" }
+               ],
+               _options: { dialogOptions: "dontDisplay" }
+            }],
+            { synchronousExecution: false, modalBehavior: "execute" }
+         );
+         return result[0].bounds;
+      };
+   }
+
    const createSelectionFromBounds = async (bounds) => {
       await batchPlay([{
             _obj: "set",
@@ -51,19 +74,21 @@ async function selectLayerBounds() {
          { synchronousExecution: false, modalBehavior: "execute" }
       );
    };
-   
+
    async function modifyDocument() {
       const bounds = await getActiveLayerBounds();
       console.log("Bounds of the active layer:", bounds);
       await createSelectionFromBounds(bounds);
       console.log("Selection has been created based on layer bounds.");
-   }; 
+   }
+
    executeAsModal(modifyDocument);
 }
 
 document
    .getElementById("selectLayerBounds")
    .addEventListener("click", selectLayerBounds);
+
 
 //------------------------------- find selection center ------------------------------------
 // if (guidesVisibility(result)) {
@@ -931,8 +956,8 @@ let savedFindCenterSettings = JSON.parse(localStorage.getItem("findCenterSetting
    useGuides: false,
    usePixel: true,
    useColorSampler: false,
-   alertCoordinates: false};
-
+   alertCoordinates: false
+};
 let savedExpandShrinkSettings = JSON.parse(localStorage.getItem("expandShrinkSettings")) || {
    expandAmount: 1,
    altExpandAmount: 5,
@@ -940,11 +965,13 @@ let savedExpandShrinkSettings = JSON.parse(localStorage.getItem("expandShrinkSet
    altShrinkAmount: 5
 };
 let savedHalveSelectionSettings = JSON.parse(localStorage.getItem("halveSelectionSettings")) || {
-   selectionBounds: true};
+   selectionBounds: true
+};
 let savedFeatherAmountSettings = JSON.parse(localStorage.getItem("featherAmountSettings")) || {
    featherAmount: 5,
    altFeatherAmount: 15,
-   featherCanvasBounds: true};
+   featherCanvasBounds: true
+};
 let savedSmoothAmountSettings = JSON.parse(localStorage.getItem("smoothAmountSettings")) || {
    smoothAmount: 5, 
    altSmoothAmount: 15, 
@@ -974,7 +1001,6 @@ document.getElementById("smoothCanvasBoundsBool").checked = savedSmoothAmountSet
 document.getElementById("o_click_featherAmount").value = savedFeatherAmountSettings.featherAmount;
 document.getElementById("o_altClick_featherAmount").value = savedFeatherAmountSettings.altFeatherAmount;
 document.getElementById("featherCanvasBoundsBool").checked = savedFeatherAmountSettings.featherCanvasBounds;
-
 
 
 const res = await document.querySelector(dialogSelector).uxpShowModal({
@@ -1045,6 +1071,7 @@ okButton.forEach(button => button.addEventListener("click", () => {
    document.getElementById('o_halveSelection').close("Ok");
    document.getElementById('o_feather').close("Ok");
    document.getElementById('o_smoothSelection').close("Ok");
+   document.getElementById('o_info').close("Ok");
 }));
 
 // cancel, ESC, or X button discards user input values
@@ -1093,4 +1120,18 @@ function resetDialogState() {
   document.getElementById("o_altClick_featherAmount").value = savedFeatherAmountSettings.altFeatherAmount;
   document.getElementById("featherCanvasBoundsBool").checked = savedFeatherAmountSettings.featherCanvasBounds;
 }
+
+//info dialog
+const openInfoDialog = async (dialogSelector, title, width, height) => {
+   const res = await document.querySelector(dialogSelector).uxpShowModal({
+      title: title,
+      resize: "both",
+      size: {
+         width: width,
+         height: height
+      }
+   })
+}
+document.getElementById("o_infoButton").addEventListener("click", () => {openInfoDialog("#o_info", "About", 500, 700);});
+
 
