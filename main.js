@@ -603,17 +603,18 @@ async function makeSelectionFromGuideListener() {
    };
 
    if (guideCheckbox) {
+      console.log(`guideCheckbox = ${guideCheckbox}. Guide listener is listening`)
        action.addNotificationListener(
            [{ event: "make", _obj: "guide" }],
            guideListener
        );
    } else {
+      console.log(`guideCheckbox = ${guideCheckbox}. Guide listener is not listening`)
        action.removeNotificationListener(
-           [{ event: "make", _obj: "guide" }]
+           [{ event: "make", _obj: "guide" }], guideListener
        );
    }
 }
-
 
 document
    .getElementById("guideCheckbox")
