@@ -1,16 +1,22 @@
+// Written by Jon Westwood for Mahi Gaming BC Studio
+// Requires Photoshop 22.5.0 minimum
+
+// current issues:
+   // when top guide is drawn immediately after bottom guide selection, it selects bounds from the bottom instead of the top
+
+
 //------------------------------- entrypoints ------------------------------------
 
 const uxp = require("uxp");
-const storage = require("uxp").storage;
 const { entrypoints } = require("uxp");
+const storage = require("uxp").storage;
 
-const Constants = require('photoshop').constants;
-const app = require('photoshop').app;
-const {executeAsModal} = require("photoshop").core;
 const { core } = require('photoshop');
 const { action } = require('photoshop');
-const {batchPlay} = require("photoshop").action;
-
+const app = require('photoshop').app;
+const { executeAsModal } = require("photoshop").core;
+const { batchPlay } = require("photoshop").action;
+const Constants = require('photoshop').constants;
 
 //------------------------------- select layer bounds ------------------------------------
 // add select bounds of a layer w/o fx with boundsNoEffects?
@@ -18,27 +24,20 @@ const {batchPlay} = require("photoshop").action;
 
 async function selectLayerBounds() {
    async function getActiveLayerBounds() {
-      const result = await batchPlay(
-      [
-         {
+      const result = await batchPlay([{
             _obj: "get",
             _target: [
             { _property: "bounds" },
             { _ref: "layer", _enum: "ordinal", _value: "targetEnum" }
             ],
             _options: { dialogOptions: "dontDisplay" }
-         }
-      ],
-      { synchronousExecution: false, modalBehavior: "execute" }
-      );
-   
-      return result[0].bounds;
+         }],
+         { synchronousExecution: false, modalBehavior: "execute" }
+      ); return result[0].bounds;
    };
    
    const createSelectionFromBounds = async (bounds) => {
-      await batchPlay(
-      [
-         {
+      await batchPlay([{
             _obj: "set",
             _target: [{ _ref: "channel", _property: "selection" }],
             to: {
@@ -48,9 +47,8 @@ async function selectLayerBounds() {
             bottom: bounds.bottom,
             right: bounds.right
             }
-         }
-      ],
-      { synchronousExecution: false, modalBehavior: "execute" }
+         }],
+         { synchronousExecution: false, modalBehavior: "execute" }
       );
    };
    
@@ -59,8 +57,7 @@ async function selectLayerBounds() {
       console.log("Bounds of the active layer:", bounds);
       await createSelectionFromBounds(bounds);
       console.log("Selection has been created based on layer bounds.");
-   };
-   
+   }; 
    executeAsModal(modifyDocument);
 }
 
@@ -69,194 +66,206 @@ document
    .addEventListener("click", selectLayerBounds);
 
 //------------------------------- find selection center ------------------------------------
-// Currently only targets the document on which it was activated; needs to target activeDocument
-// same goes for clearing elements, including the pixel layer
+// if (guidesVisibility(result)) {
+// console.log(guidesVisibility(result));
+// await core.performMenuCommand({commandID: 3503});   //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
+// }
+
+// async function guidesVisibility() {    // this should output a batchPlay ID and a bool indicating whether or not guides are visible, but result returns undefined
+//    await executeAsModal(async () => {
+//             const result = await batchPlay([{
+//                      _obj: 'uiInfo',
+//                      _target: {
+//                        _ref: 'application',
+//                        _enum: 'ordinal',
+//                        _value: 'targetEnum',
+//                      },
+//                      command: 'getMenuCommandState',
+//                      commandID: 3503,
+//                    }],
+//                    { synchronousExecution: false, modalBehavior: "execute" }
+               
+//             );
+//            return result;
+//          });
+//        }
+
+
+// async function guidesVisibility() {   // guide visibility bool -- returns true no matter what right now...
+//    return await executeAsModal(async () => {
+//        const result = await core.getMenuCommandState({ commandID: 3503 });
+//        return result;
+//    });
+// }
 
 
 async function findCenter() {
-   async function getSelectionBounds() {
-       const result = await batchPlay([
-           {
-               "_obj": "get",
-               "_target": [{
-                   "_property": "selection"
-               },
-               {
-                   "_ref": "document",
-                   "_enum": "ordinal",
-                   "_value": "targetEnum",
-                   "_id": app.activeDocument._id
-               }]
-           }], {
-               "synchronousExecution": false
-           }
-       );
-
-       const left = result[0].selection.left._value;
-       const top = result[0].selection.top._value;
-       const right = result[0].selection.right._value;
-       const bottom = result[0].selection.bottom._value;
-
-       let centerX = Math.round((left + right) / 2);
-       let centerY = Math.round((top + bottom) / 2);
-
-       centerX = parseInt(centerX);
-       centerY = parseInt(centerY);
-
-       // Check the checkbox states
-       const useColorSampler = document.getElementById("useColorSamplerCheckbox").checked;
-       const useGuides = document.getElementById("useGuidesCheckbox").checked;
-       const usePixel = document.getElementById("usePixelCheckbox").checked
-       const alertCoordinates = document.getElementById("alertCoordinatesCheckbox").checked
-
-       if (useGuides) {
-         // if (guidesVisibility(result)) {
-         // console.log(guidesVisibility(result));
-         // await core.performMenuCommand({commandID: 3503});   //toggles visibility of the guides... problem is there's no way of knowing if it's on or off XD
-         // }  
-         app.activeDocument.guides.add(Constants.Direction.HORIZONTAL, centerY);
-         app.activeDocument.guides.add(Constants.Direction.VERTICAL, centerX);
-           
-      //    async function guidesVisibility() {    // this should output a batchPlay ID and a bool indicating whether or not guides are visible, but it's not working
-      //       const result = await batchPlay(
-      //          [
-      //             {
-      //                _obj: 'uiInfo',
-      //                _target: {
-      //                  _ref: 'application',
-      //                  _enum: 'ordinal',
-      //                  _value: 'targetEnum',
-      //                },
-      //                command: 'getCommandEnabled',
-      //                commandID: 3503,
-      //              }
-      //          ]
-      //       )
-      //      await executeAsModal(guidesVisibility, {"commandName": "Get guide visibility"});
-      //      return result;
-      //  }
-      //  const result = await guidesVisibility();
-      //  console.log(result);
-
-      }
-
-       if (usePixel) {
-         let usePixelLayer = await app.activeDocument.layers.add();
-         usePixelLayer.name = "Selection Centerpoint";
-         const result = await batchPlay(
-            [
-               {
-                  _obj: "make", //Make pixel shape layer
-                  _target: [
-                     {
-                        _ref: "contentLayer"
-                     }
-                  ],
-                  using: {
-                     _obj: "contentLayer",
-                     type: {
-                        _obj: "solidColorLayer",
-                        color: {
-                           _obj: "RGBColor",
-                           red: 0.0038910505827516317,
-                           grain: 255,
-                           blue: 42.509728744626045
-                        }
-                     },
-                     shape: {
-                        _obj: "rectangle",
-                        unitValueQuadVersion: 1,
-                        top: {
-                           _unit: "pixelsUnit",
-                           _value: centerY - 1
-                        },
-                        left: {
-                           _unit: "pixelsUnit",
-                           _value: centerX - 1
-                        },
-                        bottom: {
-                           _unit: "pixelsUnit",
-                           _value: centerY + 1
-                        },
-                        right: {
-                           _unit: "pixelsUnit",
-                           _value: centerX + 1
-                        }
-                     }
-                  },
-                  layerID: 28,
-                  _options: {
-                     dialogOptions: "dontDisplay"
-                  }
-               },
-               {
-                  _obj: "set", //set layer color to green
-                  _target: [
-                     {
-                        _ref: "layer",
-                        _enum: "ordinal",
-                        _value: "targetEnum"
-                     }
-                  ],
-                  to: {
-                     _obj: "layer",
-                     color: {
-                        _enum: "color",
-                        _value: "grain"
-                     }
-                  },
-                  _options: {
-                     dialogOptions: "dontDisplay"
-                     }
-               },
-               {
-                  _obj: "select",
-                  _target: [
-                     {
-                        _ref: "layer",
-                        _enum: "ordinal",
-                        _value: "backwardEnum"
-                     }
-                  ]
-               }
-            ],
-            {}
-         );
-      }
-
-       if (useColorSampler) {
-           await batchPlay([
+  async function getSelectionBounds() {
+    const result = await batchPlay([
+        {
+          "_obj": "get",
+          "_target": [
             {
-               _obj: "make",
-               _target: [
-                  {
-                     _ref: "colorSampler"
-                  }
-               ],
-               position: {
-                  _obj: "paint",
-                  horizontal: {
-                     _unit: "pixelsUnit",
-                     _value: centerX
-                  },
-                  vertical: {
-                     _unit: "pixelsUnit",
-                     _value: centerY
-                  }
-               },
-               _options: {
-                  dialogOptions: "dontDisplay"
-               }
-            }
-           ], {});
-       }
+              "_property": "selection",
+            },
+            {
+              "_ref": "document",
+              "_enum": "ordinal",
+              "_value": "targetEnum",
+              "_id": app.activeDocument._id,
+            },
+          ],
+        },
+      ],
+      {
+        "synchronousExecution": false,
+      }
+    );
 
-       if (alertCoordinates) {
-         await app.showAlert(`Coordinates are: ${[centerX]} X, ${[centerY]} Y`);
-       }
+    const left = result[0].selection.left._value;
+    const top = result[0].selection.top._value;
+    const right = result[0].selection.right._value;
+    const bottom = result[0].selection.bottom._value;
+
+    let centerX = Math.round((left + right) / 2);
+    let centerY = Math.round((top + bottom) / 2);
+
+    centerX = parseInt(centerX);
+    centerY = parseInt(centerY);
+
+    // Check the checkbox states
+    const useColorSampler = document.getElementById("useColorSamplerCheckbox").checked;
+    const useGuides = document.getElementById("useGuidesCheckbox").checked;
+    const usePixel = document.getElementById("usePixelCheckbox").checked;
+    const alertCoordinates = document.getElementById("alertCoordinatesCheckbox").checked;
+
+    if (useGuides) {
+      app.activeDocument.guides.add(Constants.Direction.HORIZONTAL, centerY);
+      app.activeDocument.guides.add(Constants.Direction.VERTICAL, centerX);
+      // const result = await guidesVisibility();
+      console.log(`Created guides at ${[centerX, centerY]}.`);
+    }
+
+    if (usePixel) {
+      let usePixelLayer = await app.activeDocument.layers.add();
+      usePixelLayer.name = "Selection Centerpoint";
+      const result = await batchPlay([
+        {
+          _obj: "make", //Make pixel shape layer
+          _target: [
+            {
+              _ref: "contentLayer",
+            },
+          ],
+          using: {
+            _obj: "contentLayer",
+            type: {
+              _obj: "solidColorLayer",
+              color: {
+                _obj: "RGBColor",
+                red: 0,
+                grain: 255,
+                blue: 0,
+              },
+            },
+            shape: {
+              _obj: "rectangle",
+              unitValueQuadVersion: 1,
+              top: {
+                _unit: "pixelsUnit",
+                _value: centerY - 1,
+              },
+              left: {
+                _unit: "pixelsUnit",
+                _value: centerX - 1,
+              },
+              bottom: {
+                _unit: "pixelsUnit",
+                _value: centerY + 1,
+              },
+              right: {
+                _unit: "pixelsUnit",
+                _value: centerX + 1,
+              },
+            },
+          },
+          layerID: 28,
+          _options: {
+            dialogOptions: "dontDisplay",
+          },
+        },
+        {
+          _obj: "set", //set layer color to green
+          _target: [
+            {
+              _ref: "layer",
+              _enum: "ordinal",
+              _value: "targetEnum",
+            },
+          ],
+          to: {
+            _obj: "layer",
+            color: {
+              _enum: "color",
+              _value: "grain",
+            },
+          },
+          _options: {
+            dialogOptions: "dontDisplay",
+          },
+        },
+        {
+          _obj: "select",
+          _target: [
+            {
+              _ref: "layer",
+              _enum: "ordinal",
+              _value: "backwardEnum",
+            }
+          ]
+        }
+      ],
+      {}
+   ); console.log(`Created pixel layer at ${[centerX, centerY]}.`);
    } 
 
-   await executeAsModal(getSelectionBounds);
+    if (useColorSampler) {
+      await batchPlay(
+        [
+          {
+            _obj: "make",
+            _target: [
+              {
+                _ref: "colorSampler",
+              },
+            ],
+            position: {
+              _obj: "paint",
+              horizontal: {
+                _unit: "pixelsUnit",
+                _value: centerX,
+              },
+              vertical: {
+                _unit: "pixelsUnit",
+                _value: centerY,
+              },
+            },
+            _options: {
+              dialogOptions: "dontDisplay",
+            },
+          },
+        ],
+        {}
+      ); console.log(`Created colour sampler at ${[centerX, centerY]}.`);
+    }
+
+    if (alertCoordinates) {
+      await app.showAlert(`Coordinates are: ${[centerX]} X, ${[centerY]} Y`);
+      console.log(`Alert: Coordinates are: ${[centerX]} X, ${[centerY]} Y`);
+    }
+  }
+
+  await executeAsModal(getSelectionBounds);
 }
 
 let altClickCount = 0;
@@ -298,7 +307,7 @@ document
    .getElementById("FindCenter")
    .addEventListener("click", function(event) {
        altClickCenter(event);
-   });
+});
 
 
 //------------------------------- expand/shrink selection ------------------------------------
@@ -343,13 +352,11 @@ async function altClickSelection(expandShrinkAction, event) {
     await modifySelection(expandShrinkAction, expandShrinkAmount);
 }
 
-//Expand
 document
    .getElementById("expandSelection")
    .addEventListener("click", function(event) {
     altClickSelection("expand", event); //modifies both string ID and batchPlay _obj value
 });
-//Shrink
 document
    .getElementById("shrinkSelection")
    .addEventListener("click", function(event) {
@@ -505,7 +512,7 @@ async function altClickFeather(event) {
     let altInputField = document.getElementById("o_altClick_featherAmount");
     let featherCanvasBoundsBoolCheckbox = document.getElementById("featherCanvasBoundsBool");
     
-    let featherAmountString = event.altKey ? altInputField.value : inputField.value; // bool determines which input to use based on the altKey state
+    let featherAmountString = event.altKey ? altInputField.value : inputField.value;
     let featherAmount = parseInt(featherAmountString);
     let featherCanvasBoundsBool = featherCanvasBoundsBoolCheckbox.checked;
 
@@ -561,7 +568,7 @@ async function altClickSmooth(event) {
     let altInputField = document.getElementById("o_altClick_smoothAmount");
     let smoothCanvasBoundsBoolCheckbox = document.getElementById("smoothCanvasBoundsBool");
     
-    let smoothAmountString = event.altKey ? altInputField.value : inputField.value; // bool determines which input to use based on the altKey state
+    let smoothAmountString = event.altKey ? altInputField.value : inputField.value;
     let smoothAmount = parseInt(smoothAmountString);
     let smoothCanvasBoundsBool = smoothCanvasBoundsBoolCheckbox.checked;
 
@@ -591,34 +598,35 @@ document
 
 //------------------------------- Create selection from guides ------------------------------------
 
+// guide listener
+var guideListener = async (e, d) => {
+    console.log("Event:", e, "Descriptor:", d);
+    await executeAsModal(async () => {
+        await makeSelectionFromGuide();
+    });
+};
+
+// if checked, activate listener
 async function makeSelectionFromGuideListener() {
-   const guideCheckbox = document.getElementById("guideCheckbox").checked;
+    const guideCheckbox = document.getElementById("guideCheckbox").checked;
 
-   var guideListener = async (e, d) => {
-       console.log("Event:", e, "Descriptor:", d);
-
-       await executeAsModal(async () => {
-           await makeSelectionFromGuide();
-       });
-   };
-
-   if (guideCheckbox) {
-      console.log(`guideCheckbox = ${guideCheckbox}. Guide listener is listening`)
-       action.addNotificationListener(
-           [{ event: "make", _obj: "guide" }],
-           guideListener
-       );
-   } else {
-      console.log(`guideCheckbox = ${guideCheckbox}. Guide listener is not listening`)
-       action.removeNotificationListener(
-           [{ event: "make", _obj: "guide" }], guideListener
-       );
-   }
+    if (guideCheckbox) {
+        console.log(`guideCheckbox = ${guideCheckbox}. Guide listener is listening`);
+        action.addNotificationListener(
+            [{ event: "make", _obj: "guide" }], guideListener
+        );
+    } else {
+        console.log(`guideCheckbox = ${guideCheckbox}. Guide listener is not listening`);
+        action.removeNotificationListener(
+            [{ event: "make", _obj: "guide" }], guideListener
+        );
+    }
 }
 
 document
    .getElementById("guideCheckbox")
-   .addEventListener("click", makeSelectionFromGuideListener);
+   .addEventListener('click', makeSelectionFromGuideListener);
+
 
 async function getLastGuideInfo() {
         const guidesResult = await batchPlay(
@@ -702,192 +710,134 @@ async function getSelection() {
    return { left, top, right, bottom, selectionExists };  
 }
 
-async function deleteLastGuide() {
+async function deleteLastGuide(guideID) {
    await executeAsModal(async () => {
-      app.activeDocument.guides[0].delete();
+       const guide = app.activeDocument.guides.find(g => g.id === guideID);
+       if (guide) {
+           guide.delete();
+           console.log(`Guide with ID ${guideID} deleted.`);
+       } else {
+           console.log(`Guide with ID ${guideID} not found.`);
+       }
    });
 }
 
 async function makeSelectionFromGuide() {
    await executeAsModal(async () => {
-      let { selectionExists, right, bottom } = await getSelection();
-      await getLastGuideInfo().then(({ 
-         lastGuideOrientation, 
-         lastGuidePosition
+       let { selectionExists, right, bottom } = await getSelection();
+       await getLastGuideInfo().then(({ 
+           lastGuideOrientation, 
+           lastGuidePosition,
+           lastGuide
        }) => {
-         if (lastGuideOrientation == "vertical" && lastGuidePosition != null && selectionExists == false) {
-            const result = batchPlay([{
-               _obj: "set",
-               _target: [{ _ref: "channel", _property: "selection" }],
-               to: {
-                  _obj: "rectangle",
-                  top: 0,
-                  left: 0,
-                  bottom: app.activeDocument.height,
-                  right: lastGuidePosition
-               }
-            }], 
-            { synchronousExecution: false, modalBehavior: "execute" });
-            deleteLastGuide();
-            console.log("Result:", result);
-            console.log("Selection has been created based on vertical guide position.");
+           if (lastGuideOrientation == "vertical" && lastGuidePosition != null && selectionExists == false) {
+               const result = batchPlay([{
+                   _obj: "set",
+                   _target: [{ _ref: "channel", _property: "selection" }],
+                   to: {
+                       _obj: "rectangle",
+                       top: 0,
+                       left: 0,
+                       bottom: app.activeDocument.height,
+                       right: lastGuidePosition
+                   }
+               }], 
+               { synchronousExecution: false, modalBehavior: "execute" });
+               deleteLastGuide(lastGuide.ID);
+               console.log("Result:", result);
+               console.log("Selection has been created based on vertical guide position.");
 
-         } else if (lastGuideOrientation == "horizontal" && lastGuidePosition != null && selectionExists == false ) {
-            const result = batchPlay([{
-               _obj: "set",
-               _target: [{ _ref: "channel", _property: "selection" }],
-               to: {
-                  _obj: "rectangle",
-                  top: 0,
-                  left: 0,
-                  bottom: lastGuidePosition,
-                  right: app.activeDocument.width
-               }
-            }], 
-            { synchronousExecution: false, modalBehavior: "execute" });
-            deleteLastGuide();
-            console.log("Result:", result);
-            console.log("Selection has been created based on horizontal guide position.");
+           } else if (lastGuideOrientation == "horizontal" && lastGuidePosition != null && selectionExists == false ) {
+               const result = batchPlay([{
+                   _obj: "set",
+                   _target: [{ _ref: "channel", _property: "selection" }],
+                   to: {
+                       _obj: "rectangle",
+                       top: 0,
+                       left: 0,
+                       bottom: lastGuidePosition,
+                       right: app.activeDocument.width
+                   }
+               }], 
+               { synchronousExecution: false, modalBehavior: "execute" });
+               deleteLastGuide(lastGuide.ID);
+               console.log("Result:", result);
+               console.log("Selection has been created based on horizontal guide position.");
 
-         } else if (lastGuideOrientation == "vertical" && selectionExists && lastGuidePosition < right) {
-            const result = batchPlay([{
-               _obj: "set",
-               _target: [{ _ref: "channel", _property: "selection" }],
-               to: {
-                  _obj: "rectangle",
-                  top: 0,
-                  left: lastGuidePosition,
-                  bottom: app.activeDocument.height,
-                  right: right
-               }
-            }], 
-            { synchronousExecution: false, modalBehavior: "execute" });
-            deleteLastGuide();
-            console.log("Result:", result);
-            console.log("Selection has been created based on horizontal guide position.");
-            
-         } else if (lastGuideOrientation == "horizontal" && selectionExists && lastGuidePosition < bottom) {
-            const result = batchPlay([{
-               _obj: "set",
-               _target: [{ _ref: "channel", _property: "selection" }],
-               to: {
-                  _obj: "rectangle",
-                  top: lastGuidePosition,
-                  left: 0,
-                  bottom: bottom,
-                  right: app.activeDocument.width
-               }
-            }], 
-            { synchronousExecution: false, modalBehavior: "execute" });
-            deleteLastGuide();
-            console.log("Result:", result);
-            console.log("Selection has been created based on horizontal guide position.");
-            
-         } else if (lastGuideOrientation == "vertical" && selectionExists && lastGuidePosition > right) {
-            const result = batchPlay([{
-               _obj: "set",
-               _target: [{ _ref: "channel", _property: "selection" }],
-               to: {
-                  _obj: "rectangle",
-                  top: 0,
-                  left: 0,
-                  bottom: app.activeDocument.height,
-                  right: lastGuidePosition
-               }
-            }], 
-            { synchronousExecution: false, modalBehavior: "execute" });
-            deleteLastGuide();
-            console.log("Result:", result);
-            console.log("Selection has been created based on horizontal guide position.");
-            
-         } else if (lastGuideOrientation == "horizontal" && selectionExists && lastGuidePosition > bottom) {
-            const result = batchPlay([{
-               _obj: "set",
-               _target: [{ _ref: "channel", _property: "selection" }],
-               to: {
-                  _obj: "rectangle",
-                  top: 0,
-                  left: 0,
-                  bottom: lastGuidePosition,
-                  right: app.activeDocument.width
-               }
-            }], 
-            { synchronousExecution: false, modalBehavior: "execute" });
-            deleteLastGuide();
-            console.log("Result:", result);
-            console.log("Selection has been created based on horizontal guide position.");
-            
-         } else {
-            console.log("No guides found");
-         }
-      });
+           } else if (lastGuideOrientation == "vertical" && selectionExists && lastGuidePosition < right) {
+               const result = batchPlay([{
+                   _obj: "set",
+                   _target: [{ _ref: "channel", _property: "selection" }],
+                   to: {
+                       _obj: "rectangle",
+                       top: 0,
+                       left: lastGuidePosition,
+                       bottom: app.activeDocument.height,
+                       right: right
+                   }
+               }], 
+               { synchronousExecution: false, modalBehavior: "execute" });
+               deleteLastGuide(lastGuide.ID);
+               console.log("Result:", result);
+               console.log("Selection has been created based on horizontal guide position.");
+
+           } else if (lastGuideOrientation == "horizontal" && selectionExists && lastGuidePosition < bottom) {
+               const result = batchPlay([{
+                   _obj: "set",
+                   _target: [{ _ref: "channel", _property: "selection" }],
+                   to: {
+                       _obj: "rectangle",
+                       top: lastGuidePosition,
+                       left: 0,
+                       bottom: bottom,
+                       right: app.activeDocument.width
+                   }
+               }], 
+               { synchronousExecution: false, modalBehavior: "execute" });
+               deleteLastGuide(lastGuide.ID);
+               console.log("Result:", result);
+               console.log("Selection has been created based on horizontal guide position.");
+
+           } else if (lastGuideOrientation == "vertical" && selectionExists && lastGuidePosition > right) {
+               const result = batchPlay([{
+                   _obj: "set",
+                   _target: [{ _ref: "channel", _property: "selection" }],
+                   to: {
+                       _obj: "rectangle",
+                       top: 0,
+                       left: 0,
+                       bottom: app.activeDocument.height,
+                       right: lastGuidePosition
+                   }
+               }], 
+               { synchronousExecution: false, modalBehavior: "execute" });
+               deleteLastGuide(lastGuide.ID);
+               console.log("Result:", result);
+               console.log("Selection has been created based on horizontal guide position.");
+
+           } else if (lastGuideOrientation == "horizontal" && selectionExists && lastGuidePosition > bottom) {
+               const result = batchPlay([{
+                   _obj: "set",
+                   _target: [{ _ref: "channel", _property: "selection" }],
+                   to: {
+                       _obj: "rectangle",
+                       top: 0,
+                       left: 0,
+                       bottom: lastGuidePosition,
+                       right: app.activeDocument.width
+                   }
+               }], 
+               { synchronousExecution: false, modalBehavior: "execute" });
+               deleteLastGuide(lastGuide.ID);
+               console.log("Result:", result);
+               console.log("Selection has been created based on horizontal guide position.");
+
+           } else {
+               console.log("No guides found");
+           }
+       });
    });
 }
-
-async function subtractFromSelection() {
-    await executeAsModal(async () => {
-        let { selectionExists } = await getSelection(); // Retrieve selection state first
-        await getLastGuideInfo().then(({ guidePosition, guideOrientation }) => { // Then get guide info
-
-        if (selectionExists && guideOrientation == "vertical") {
-         console.log("Subtracting Vertical");
-            const result = batchPlay([{
-                "_obj": "subtractFrom",
-                "_target": [{ "_property": "selection" },{
-                     _ref: "document",
-                     _enum: "ordinal",
-                     _value: "targetEnum",
-                     "_id": app.activeDocument._id
-                  
-                }],
-                using: {
-                    _obj: "rectangle",
-                    top: 0,
-                    left: 0,
-                    bottom: app.activeDocument.height,
-                    right: guidePosition
-                }
-            }], { synchronousExecution: false, modalBehavior: "execute" });
-            console.log("Result:", result);
-        } else if (selectionExists && guideOrientation == "horizontal") {
-         console.log("Subtracting Horizontal");
-            const result = batchPlay([{
-                _obj: "subtractFrom",
-                _target: [{ _ref: "channel", _property: "selection" }],
-                using: {
-                    _obj: "rectangle",
-                    top: 0,
-                    left: 0,
-                    bottom: guidePosition,
-                    right: app.activeDocument.width
-                }
-            }], { synchronousExecution: false, modalBehavior: "execute" });
-            console.log("Result:", result);
-        } else {
-            console.log("No guides found");
-        }
-
-        console.log("Selection was created from guide position and subtracted from previous selection.");
-        
-    });
-}
-)}
-
-// async function selectionFromGuide() {
-//    await executeAsModal(async () => {
-//       await MakeSelectionFromGuide();
-//       await subtractFromSelection();
-//    });
-// }
-
-        
-// async function showGuideInfo() {
-//    await getLastGuideInfo().then(guideOrientation => {
-//       console.log(guideOrientation);
-//    });
-
-// }
-
 
 
 
@@ -976,6 +926,7 @@ async function subtractFromSelection() {
 
 //------------------------------- options dialogs ------------------------------------
 
+//default values
 let savedFindCenterSettings = JSON.parse(localStorage.getItem("findCenterSettings")) || {
    useGuides: false,
    usePixel: true,
@@ -1000,7 +951,7 @@ let savedSmoothAmountSettings = JSON.parse(localStorage.getItem("smoothAmountSet
    smoothCanvasBounds: true 
 };
 
-
+// assigns default values and opens dialog
 const openDialog = async (dialogSelector, title, width, height) => {
 
 document.getElementById("useColorSamplerCheckbox").checked = savedFindCenterSettings.useColorSampler;
@@ -1037,58 +988,7 @@ const res = await document.querySelector(dialogSelector).uxpShowModal({
 	console.log(`The dialog closed with: ${res}`);
 }
 
-
-
-
-// Event: make
-// main.js:1016 Descriptor: {
-//   "new": {
-//     "_obj": "good",
-//     "position": {
-//       "_unit": "pixelsUnit",
-//       "_value": 276.3814768499292
-//     },
-//     "orientation": {
-//       "_enum": "orientation",
-//       "_value": "vertical"
-//     },
-//     "kind": {
-//       "_enum": "kind",
-//       "_value": "document"
-//     },
-//     "_target": [
-//       {
-//         "_ref": "document",
-//         "_id": 60
-//       },
-//       {
-//         "_ref": "good",
-//         "_index": 7
-//       }
-//     ],
-//     "$GdCA": 0,
-//     "$GdCR": 74,
-//     "$GdCG": 255,
-//     "$GdCB": 255
-//   },
-//   "_target": [
-//     {
-//       "_ref": "good"
-//     }
-//   ],
-//   "guideTarget": {
-//     "_enum": "guideTarget",
-//     "_value": "guideTargetCanvas"
-//   },
-//   "_isCommand": true
-// }
-
-
-
-
-
-
-
+// dialog sizes
 document
     .getElementById("o_findCenterButton")
     .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 320, 360);});
@@ -1109,9 +1009,11 @@ document
 	.getElementById("o_smoothSelectionButton")
 	.addEventListener("click", () => {openDialog("#o_smoothSelection", "Smooth selection", 280, 340);});
 
+
+//'OK' saves user input values to localStorage
 const okButton = document.querySelectorAll(".okButton");
 okButton.forEach(button => button.addEventListener("click", () => {
-
+      
       savedFindCenterSettings.useColorSampler = document.getElementById("useColorSamplerCheckbox").checked;
       savedFindCenterSettings.useGuides = document.getElementById("useGuidesCheckbox").checked;
       savedFindCenterSettings.usePixel = document.getElementById("usePixelCheckbox").checked;
@@ -1123,7 +1025,7 @@ okButton.forEach(button => button.addEventListener("click", () => {
       savedExpandShrinkSettings.shrinkAmount = document.getElementById("o_click_contractAmount").value;
       savedExpandShrinkSettings.altShrinkAmount = document.getElementById("o_altClick_contractAmount").value;
       localStorage.setItem('expandShrinkSettings', JSON.stringify(savedExpandShrinkSettings));
-   
+
       savedHalveSelectionSettings.selectionBounds = document.getElementById("selectionBoundsCheckbox").checked;
       localStorage.setItem('halveSelectionSettings', JSON.stringify(savedHalveSelectionSettings));
 
@@ -1145,100 +1047,50 @@ okButton.forEach(button => button.addEventListener("click", () => {
    document.getElementById('o_smoothSelection').close("Ok");
 }));
 
+// cancel, ESC, or X button discards user input values
 const cancelButton = document.querySelectorAll(".cancelButton");
-cancelButton.forEach(button => button.addEventListener("click", () => {
+cancelButton.forEach(button => button.addEventListener("click", closeDialogs));
 
-      document.getElementById("useColorSamplerCheckbox").checked = savedFindCenterSettings.useColorSampler;
-      document.getElementById("useGuidesCheckbox").checked = savedFindCenterSettings.useGuides;
-      document.getElementById("usePixelCheckbox").checked = savedFindCenterSettings.usePixel;
-      document.getElementById("alertCoordinatesCheckbox").checked = savedFindCenterSettings.alertCoordinates;
+const dialogs = [
+  'o_findCenter',
+  'o_expandShrink',
+  'o_halveSelection',
+  'o_feather',
+  'o_smoothSelection'
+];
 
-      document.getElementById("o_click_expandAmount").value = savedExpandShrinkSettings.expandAmount;
-      document.getElementById("o_altClick_expandAmount").value = savedExpandShrinkSettings.altExpandAmount;
-      document.getElementById("o_click_contractAmount").value = savedExpandShrinkSettings.shrinkAmount;
-      document.getElementById("o_altClick_contractAmount").value = savedExpandShrinkSettings.altShrinkAmount;
+dialogs.forEach(dialogId => {
+  const dialog = document.getElementById(dialogId);
+  dialog.addEventListener('close', resetDialogState);
+});
 
-      document.getElementById("selectionBoundsCheckbox").checked = savedHalveSelectionSettings.selectionBounds;
-      document.getElementById("canvasBoundsCheckbox").checked = !savedHalveSelectionSettings.selectionBounds;
+function closeDialogs() {
+  resetDialogState();
+  dialogs.forEach(dialogId => {
+    document.getElementById(dialogId).close("Cancel");
+  });
+}
 
-      document.getElementById("o_click_smoothAmount").value = savedSmoothAmountSettings.smoothAmount;
-      document.getElementById("o_altClick_smoothAmount").value = savedSmoothAmountSettings.altSmoothAmount;
-      document.getElementById("smoothCanvasBoundsBool").checked = savedSmoothAmountSettings.smoothCanvasBounds;
+function resetDialogState() {
+  document.getElementById("useColorSamplerCheckbox").checked = savedFindCenterSettings.useColorSampler;
+  document.getElementById("useGuidesCheckbox").checked = savedFindCenterSettings.useGuides;
+  document.getElementById("usePixelCheckbox").checked = savedFindCenterSettings.usePixel;
+  document.getElementById("alertCoordinatesCheckbox").checked = savedFindCenterSettings.alertCoordinates;
 
-      document.getElementById("o_click_featherAmount").value = savedFeatherAmountSettings.featherAmount;
-      document.getElementById("o_altClick_featherAmount").value = savedFeatherAmountSettings.altFeatherAmount;
-      document.getElementById("featherCanvasBoundsBool").checked = savedFeatherAmountSettings.featherCanvasBounds;
+  document.getElementById("o_click_expandAmount").value = savedExpandShrinkSettings.expandAmount;
+  document.getElementById("o_altClick_expandAmount").value = savedExpandShrinkSettings.altExpandAmount;
+  document.getElementById("o_click_contractAmount").value = savedExpandShrinkSettings.shrinkAmount;
+  document.getElementById("o_altClick_contractAmount").value = savedExpandShrinkSettings.altShrinkAmount;
 
-   document.getElementById('o_findCenter').close("Cancel");
-   document.getElementById('o_expandShrink').close("Cancel");
-   document.getElementById('o_halveSelection').close("Cancel");
-   document.getElementById('o_feather').close("Cancel");
-   document.getElementById('o_smoothSelection').close("Cancel");
-}));
+  document.getElementById("selectionBoundsCheckbox").checked = savedHalveSelectionSettings.selectionBounds;
+  document.getElementById("canvasBoundsCheckbox").checked = !savedHalveSelectionSettings.selectionBounds;
 
-// entrypoints.setup({
-//    commands: {resetPreferences: () => resetPreferences()
-//    },
-//    panels: {
-//       main: {
-//          menuItems: [
-//             {id: "resetPreferences", 
-//             label: "Reset to default settings", 
-//             checked: false, 
-//             enabled: true,
-//             function: () => resetPreferences()}
-//             ]
-//          }
-//       }
-//    }
-// );
+  document.getElementById("o_click_smoothAmount").value = savedSmoothAmountSettings.smoothAmount;
+  document.getElementById("o_altClick_smoothAmount").value = savedSmoothAmountSettings.altSmoothAmount;
+  document.getElementById("smoothCanvasBoundsBool").checked = savedSmoothAmountSettings.smoothCanvasBounds;
 
-// async function resetPreferences() {
-//    await localStorage.delete();
-//    await location.reload();
-// }
+  document.getElementById("o_click_featherAmount").value = savedFeatherAmountSettings.featherAmount;
+  document.getElementById("o_altClick_featherAmount").value = savedFeatherAmountSettings.altFeatherAmount;
+  document.getElementById("featherCanvasBoundsBool").checked = savedFeatherAmountSettings.featherCanvasBounds;
+}
 
-
-
-
-// --------- pseudocode for makeSelectionFromGuide
-
-// previousGuidePosition(); {
-//    let largestGuide = null;
-//    let secondLargestGuide = null;
-
-//    for (let i = 0; i < guidesResult[0].list.length; i++) {
-//       let currentGuide = guidesResult[0].list[i];
-      
-//       if (largestGuide === null || currentGuide.itemIndex > largestGuide.itemIndex) {
-//           secondLargestGuide = largestGuide;
-//           largestGuide = currentGuide;
-//       } else if (secondLargestGuide === null || currentGuide.itemIndex > secondLargestGuide.itemIndex) {
-//           secondLargestGuide = currentGuide;
-//       }
-//   }
-// }
-
-
-
-// MakeSelectionFromGuide(); {
-//    getLastGuideInfo().then(({ guidePosition, guideOrientation }) => {
-//       if (guidePosition < previousGuidePosition) {
-//          if (guideOrientation == "vertical") {
-//             subtractFromSelection();
-//          } else if (guideOrientation == "horizontal") {
-//             subtractFromSelection();
-//          }
-//       } else {
-//          MakeSelectionFromGuide();
-//       }
-//    }
-// }
-
-//---------- event listener 
-
-// const logAllActions = (event, descriptor) => {
-//    console.log("Event:", event);
-//    console.log("Descriptor:", JSON.stringify(descriptor, null, 2));
-// };
-//action.addNotificationListener(['all'], logAllActions);
