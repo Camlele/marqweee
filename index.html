@@ -144,19 +144,16 @@
         </sp-action-group>
 
         <!--Selection from guides-->
-        <sp-label>Selection from guides</sp-label>
-        <sp-action-group style="display: flex; justify-content: space-between;">
-          <sp-action-button toggles emphasized label="Edit">
-            <div slot="icon" class="icon">
-              <svg id="a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><path d="M763.45,998h-207.26v-70h207.26v70ZM426.93,998h-189.93c-6.58,0-13.23-.28-19.76-.82l5.81-69.76c4.61.38,9.3.58,13.95.58h189.93v70ZM904.92,950.32l-42.31-55.77c41.56-31.53,65.39-79.48,65.39-131.55v-22.23h70v22.23c0,37.39-8.53,73.14-25.36,106.28-16.03,31.57-39.45,59.59-67.72,81.04ZM80.21,938.05C30.51,893.5,2,829.7,2,763v-38.67h70v38.67c0,46.83,20.02,91.64,54.93,122.92l-46.72,52.13ZM998,611.51h-70v-206.81h70v206.81ZM72,595.07H2v-206.81h70v206.81ZM998,275.45h-70v-38.45c0-46.9-20.07-91.75-55.06-123.04l46.66-52.18c49.83,44.56,78.4,108.42,78.4,175.22v38.45ZM72,259H2v-22c0-36.91,8.79-73.7,25.42-106.4,16.07-31.6,39.54-59.64,67.87-81.08l42.24,55.82c-41.65,31.52-65.54,79.51-65.54,131.67v22ZM776.76,72.56c-4.55-.37-9.18-.56-13.76-.56h-190.16V2h190.16c6.49,0,13.05.27,19.5.8l-5.74,69.76ZM443.59,72h-206.81V2h206.81v70Z"  /></svg>
-            </div>
-          </sp-action-button>
-
-          <sp-action-button label="Edit" title="Options">
+        
+        <sp-action-group title="">
+         <div class="group">
+          <sp-checkbox id="guideCheckbox" style="display: flex; justify-content: space-evenly;" size="L" style="margin-left: 5px;" title="Creates a selection from the last created guide to the edge of the canvas"><sp-label>Guides to selection</sp-label></sp-checkbox>
+</div>
+          <!-- <sp-action-button label="Edit" id="o_smoothSelectionButton" title="Options">
             <div slot="icon" class="icon">
               <svg id="a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><path d="M439,785c0-41.42,33.58-75,75-75h0c41.42,0,75,33.58,75,75h0c0,41.42-33.58,75-75,75h0c-41.42,0-75-33.58-75-75ZM439,485c0-41.42,33.58-75,75-75h0c41.42,0,75,33.58,75,75h0c0,41.42-33.58,75-75,75h0c-41.42,0-75-33.58-75-75ZM439,185c0-41.42,33.58-75,75-75h0c41.42,0,75,33.58,75,75h0c0,41.42-33.58,75-75,75h0c-41.42,0-75-33.58-75-75Z"  />
               </svg>
-            </div>       
+            </div> -->
 
         </sp-action-group>
       </div>
@@ -182,7 +179,8 @@
           <sp-checkbox size="s" id="useColorSamplerCheckbox">Colour sampler</sp-checkbox>
         </sp-field-group>
 
-<hr style="margin-top: 15px;">
+        <sp-divider size="medium" style="margin-top: 13px; margin-bottom: 5px;"></sp-divider>
+        
         <sp-field-group style="padding-top: 5px;">
           <sp-checkbox size="s" id="alertCoordinatesCheckbox">Display coordinates?</sp-checkbox>
         </sp-field-group>
@@ -226,7 +224,7 @@
           <sp-textfield type="number" id="o_altClick_expandAmount" width="50px" style="margin-bottom: 10px;" placeholder="5"></sp-textfield>
         </sp-field-group>
 
-        <hr>
+        <sp-divider size="medium" style="margin-top: 10px; margin-bottom: 10px;"></sp-divider>
 
         <sp-label size="L">Shrink selection amount:</sp-label>
 

@@ -102,8 +102,10 @@ body {
   height: 100vh;
   flex-direction: column;
   display: flex;
-  padding: 12px;
-  overflow: scroll;
+  padding-left: 12px;
+  padding-bottom: 12px;
+  padding-top: 12px;
+  overflow:scroll;
 }
 
 .o_wrapper {
@@ -179,15 +181,15 @@ body {
   flex: 0 0 auto;
 }
 
-/* groups 
+/* groups */
 .group {
     flex: 0 0 auto;
     background-color: rgba(0,0,0,0.5);
     border-radius: 4px;
-    padding: 24px 12px 12px 12px;
-    position: relative;
+    /* padding: 24px 12px 12px 12px; */
+    /* position: relative; */
     margin-top: 1em;
-    margin-bottom: 12px;
+    /* margin-bottom: 12px; */
 }
 #sp-native-tab-page .group {
   background-color: transparent;
@@ -213,8 +215,8 @@ body {
 }
 
 .group > :not(sp-label) {
-  margin: 6px;
-}*/
+  /* margin: 6px; */
+}
 
 /* icons */
 .icon {

@@ -8,7 +8,9 @@ const Constants = require('photoshop').constants;
 const app = require('photoshop').app;
 const {executeAsModal} = require("photoshop").core;
 const { core } = require('photoshop');
+const { action } = require('photoshop');
 const {batchPlay} = require("photoshop").action;
+
 
 //------------------------------- select layer bounds ------------------------------------
 // add select bounds of a layer w/o fx with boundsNoEffects?
@@ -589,6 +591,35 @@ document
 
 //------------------------------- Create selection from guides ------------------------------------
 
+async function makeSelectionFromGuideListener() {
+   const guideCheckbox = document.getElementById("guideCheckbox").checked;
+
+   var guideListener = async (e, d) => {
+       console.log("Event:", e, "Descriptor:", d);
+
+       await executeAsModal(async () => {
+           await makeSelectionFromGuide();
+       });
+   };
+
+   if (guideCheckbox) {
+      console.log(`guideCheckbox = ${guideCheckbox}. Guide listener is listening`)
+       action.addNotificationListener(
+           [{ event: "make", _obj: "guide" }],
+           guideListener
+       );
+   } else {
+      console.log(`guideCheckbox = ${guideCheckbox}. Guide listener is not listening`)
+       action.removeNotificationListener(
+           [{ event: "make", _obj: "guide" }], guideListener
+       );
+   }
+}
+
+document
+   .getElementById("guideCheckbox")
+   .addEventListener("click", makeSelectionFromGuideListener);
+
 async function getLastGuideInfo() {
         const guidesResult = await batchPlay(
          [{
@@ -621,13 +652,23 @@ async function getLastGuideInfo() {
          ],
          {}
       );
-      let guideIndex = guidesResult[0].list.reduce((max, guide) =>
-         guide.itemIndex > max.itemIndex ? guide : max, guidesResult[0].list[0]); //gets highest index guide
+      let sortedGuides = guidesResult[0].list.sort((a, b) => b.itemIndex - a.itemIndex); //gets highest index guide
+      let lastGuide = sortedGuides[0];
+      let secondLastGuide = sortedGuides.length > 1 ? sortedGuides[1] : null; 
 
-      let guideOrientation = guideIndex.orientation._value;
-      let guidePosition = guideIndex.position._value;
-  
-      return { guideOrientation, guidePosition, guideIndex };
+      let lastGuideOrientation = lastGuide.orientation._value;
+      let lastGuidePosition = lastGuide.position._value;
+      let secondLastGuideOrientation = secondLastGuide ? secondLastGuide.orientation._value : null;
+      let secondLastGuidePosition = secondLastGuide ? secondLastGuide.position._value : null;
+
+      return { lastGuideOrientation, 
+               lastGuidePosition,
+               secondLastGuideOrientation,
+               secondLastGuidePosition,
+               lastGuide,
+               secondLastGuide
+             };
+      
 }
 
 async function getSelection() {
@@ -659,30 +700,258 @@ async function getSelection() {
    let bottom = result[0].selection.bottom._value; 
 
    return { left, top, right, bottom, selectionExists };  
+}
 
+async function deleteLastGuide() {
+   await executeAsModal(async () => {
+      app.activeDocument.guides[0].delete();
+   });
+}
+
+async function makeSelectionFromGuide() {
+   await executeAsModal(async () => {
+      let { selectionExists, right, bottom } = await getSelection();
+      await getLastGuideInfo().then(({ 
+         lastGuideOrientation, 
+         lastGuidePosition
+       }) => {
+         if (lastGuideOrientation == "vertical" && lastGuidePosition != null && selectionExists == false) {
+            const result = batchPlay([{
+               _obj: "set",
+               _target: [{ _ref: "channel", _property: "selection" }],
+               to: {
+                  _obj: "rectangle",
+                  top: 0,
+                  left: 0,
+                  bottom: app.activeDocument.height,
+                  right: lastGuidePosition
+               }
+            }], 
+            { synchronousExecution: false, modalBehavior: "execute" });
+            deleteLastGuide();
+            console.log("Result:", result);
+            console.log("Selection has been created based on vertical guide position.");
+
+         } else if (lastGuideOrientation == "horizontal" && lastGuidePosition != null && selectionExists == false ) {
+            const result = batchPlay([{
+               _obj: "set",
+               _target: [{ _ref: "channel", _property: "selection" }],
+               to: {
+                  _obj: "rectangle",
+                  top: 0,
+                  left: 0,
+                  bottom: lastGuidePosition,
+                  right: app.activeDocument.width
+               }
+            }], 
+            { synchronousExecution: false, modalBehavior: "execute" });
+            deleteLastGuide();
+            console.log("Result:", result);
+            console.log("Selection has been created based on horizontal guide position.");
+
+         } else if (lastGuideOrientation == "vertical" && selectionExists && lastGuidePosition < right) {
+            const result = batchPlay([{
+               _obj: "set",
+               _target: [{ _ref: "channel", _property: "selection" }],
+               to: {
+                  _obj: "rectangle",
+                  top: 0,
+                  left: lastGuidePosition,
+                  bottom: app.activeDocument.height,
+                  right: right
+               }
+            }], 
+            { synchronousExecution: false, modalBehavior: "execute" });
+            deleteLastGuide();
+            console.log("Result:", result);
+            console.log("Selection has been created based on horizontal guide position.");
+            
+         } else if (lastGuideOrientation == "horizontal" && selectionExists && lastGuidePosition < bottom) {
+            const result = batchPlay([{
+               _obj: "set",
+               _target: [{ _ref: "channel", _property: "selection" }],
+               to: {
+                  _obj: "rectangle",
+                  top: lastGuidePosition,
+                  left: 0,
+                  bottom: bottom,
+                  right: app.activeDocument.width
+               }
+            }], 
+            { synchronousExecution: false, modalBehavior: "execute" });
+            deleteLastGuide();
+            console.log("Result:", result);
+            console.log("Selection has been created based on horizontal guide position.");
+            
+         } else if (lastGuideOrientation == "vertical" && selectionExists && lastGuidePosition > right) {
+            const result = batchPlay([{
+               _obj: "set",
+               _target: [{ _ref: "channel", _property: "selection" }],
+               to: {
+                  _obj: "rectangle",
+                  top: 0,
+                  left: 0,
+                  bottom: app.activeDocument.height,
+                  right: lastGuidePosition
+               }
+            }], 
+            { synchronousExecution: false, modalBehavior: "execute" });
+            deleteLastGuide();
+            console.log("Result:", result);
+            console.log("Selection has been created based on horizontal guide position.");
+            
+         } else if (lastGuideOrientation == "horizontal" && selectionExists && lastGuidePosition > bottom) {
+            const result = batchPlay([{
+               _obj: "set",
+               _target: [{ _ref: "channel", _property: "selection" }],
+               to: {
+                  _obj: "rectangle",
+                  top: 0,
+                  left: 0,
+                  bottom: lastGuidePosition,
+                  right: app.activeDocument.width
+               }
+            }], 
+            { synchronousExecution: false, modalBehavior: "execute" });
+            deleteLastGuide();
+            console.log("Result:", result);
+            console.log("Selection has been created based on horizontal guide position.");
+            
+         } else {
+            console.log("No guides found");
+         }
+      });
+   });
 }
 
 async function subtractFromSelection() {
-   console.log("selection exists");
-} 
+    await executeAsModal(async () => {
+        let { selectionExists } = await getSelection(); // Retrieve selection state first
+        await getLastGuideInfo().then(({ guidePosition, guideOrientation }) => { // Then get guide info
 
-async function MakeSelectionFromGuide(guideOrientation, selectionExists) {
-   getLastGuideInfo();
-   getSelection();
-   
-   
-   console.log(guideOrientation, selectionExists);
-   
+        if (selectionExists && guideOrientation == "vertical") {
+         console.log("Subtracting Vertical");
+            const result = batchPlay([{
+                "_obj": "subtractFrom",
+                "_target": [{ "_property": "selection" },{
+                     _ref: "document",
+                     _enum: "ordinal",
+                     _value: "targetEnum",
+                     "_id": app.activeDocument._id
+                  
+                }],
+                using: {
+                    _obj: "rectangle",
+                    top: 0,
+                    left: 0,
+                    bottom: app.activeDocument.height,
+                    right: guidePosition
+                }
+            }], { synchronousExecution: false, modalBehavior: "execute" });
+            console.log("Result:", result);
+        } else if (selectionExists && guideOrientation == "horizontal") {
+         console.log("Subtracting Horizontal");
+            const result = batchPlay([{
+                _obj: "subtractFrom",
+                _target: [{ _ref: "channel", _property: "selection" }],
+                using: {
+                    _obj: "rectangle",
+                    top: 0,
+                    left: 0,
+                    bottom: guidePosition,
+                    right: app.activeDocument.width
+                }
+            }], { synchronousExecution: false, modalBehavior: "execute" });
+            console.log("Result:", result);
+        } else {
+            console.log("No guides found");
+        }
+
+        console.log("Selection was created from guide position and subtracted from previous selection.");
+        
+    });
 }
+)}
 
+// async function selectionFromGuide() {
+//    await executeAsModal(async () => {
+//       await MakeSelectionFromGuide();
+//       await subtractFromSelection();
+//    });
+// }
 
         
+// async function showGuideInfo() {
+//    await getLastGuideInfo().then(guideOrientation => {
+//       console.log(guideOrientation);
+//    });
+
+// }
 
 
 
 
+// Pseudocode logic
 
-// Logic
+
+// function getLastGuideInfo() {
+//    guide result = batchPlay(
+//       get guide info;
+//    )
+//    if (guide index) = latest index {
+//       let guideLastPosition;
+//    } else if (guide index = second latest index) {
+//       let guideSecondLastPosition;
+//    }
+//    return { guideOrientation, guideLastPosition, guideSecondLastPosition };
+// }
+
+// function MakeSelectionFromGuide() {
+//    getLastGuideInfo().then(({ guideOrientation, guideLastPosition, guideSecondLastPosition }) => {
+//       if (guideOrientation == "vertical" && guideLastPosition != undefined && guideSecondLastPosition == undefined) {
+//          result = batchPlay(
+//             set selection to
+//             top: 0,
+//             left: 0,
+//             bottom: document.height,
+//             right: guideLastPosition
+//          );
+//          await deleteLastGuide();
+//       } else if (guideOrientation == "horizontal" && guideLastPosition != undefined && guideSecondLastPosition == undefined) {
+//          result = batchPlay(
+//             set selection to
+//             top: 0,
+//             left: 0,
+//             bottom: guideLastPosition,
+//             right: document.width
+//          );
+//          await deleteLastGuide();
+//       } else if (guideOrientation == "vertical" && guideSecondLastPosition != undefined) {
+//          result = batchPlay(
+//             set selection to
+//             top: 0,
+//             left: guideLastPosition,
+//             bottom: document.height,
+//             right: guideSecondLastPosition
+//          );
+//          await deleteLastGuide();
+//       } else if (guideOrientation == "horizontal" && guideSecondLastPosition != undefined) {
+//          result = batchPlay(
+//             set selection to
+//             top: guideLastPosition,
+//             left: 0,
+//             bottom: guideSecondLastPosition,
+//             right: document.width
+//          );
+//          await deleteLastGuide();
+//       } else if (guideOrientation == undefined || guidePosition == undefined || guideSecondLastPosition == undefined) {
+//          console.log("No guides found");
+//       }
+//    });
+// }
+
+
+
 
 // MakeSelectionFromGuide(guide[value]); {
 //    if (guideToggleOn) {
@@ -770,13 +1039,63 @@ const res = await document.querySelector(dialogSelector).uxpShowModal({
 
 
 
+
+// Event: make
+// main.js:1016 Descriptor: {
+//   "new": {
+//     "_obj": "good",
+//     "position": {
+//       "_unit": "pixelsUnit",
+//       "_value": 276.3814768499292
+//     },
+//     "orientation": {
+//       "_enum": "orientation",
+//       "_value": "vertical"
+//     },
+//     "kind": {
+//       "_enum": "kind",
+//       "_value": "document"
+//     },
+//     "_target": [
+//       {
+//         "_ref": "document",
+//         "_id": 60
+//       },
+//       {
+//         "_ref": "good",
+//         "_index": 7
+//       }
+//     ],
+//     "$GdCA": 0,
+//     "$GdCR": 74,
+//     "$GdCG": 255,
+//     "$GdCB": 255
+//   },
+//   "_target": [
+//     {
+//       "_ref": "good"
+//     }
+//   ],
+//   "guideTarget": {
+//     "_enum": "guideTarget",
+//     "_value": "guideTargetCanvas"
+//   },
+//   "_isCommand": true
+// }
+
+
+
+
+
+
+
 document
     .getElementById("o_findCenterButton")
     .addEventListener("click", () => {openDialog("#o_findCenter", "Find selection center", 320, 360);});
 
 document
 	.getElementById("o_expandShrinkButton")
-	.addEventListener("click", () => {openDialog("#o_expandShrink", "Expand / shrink selection", 320, 480);});
+	.addEventListener("click", () => {openDialog("#o_expandShrink", "Expand / shrink selection", 320, 490);});
 
 document
    .getElementById("o_halveSelectionButton")
@@ -878,3 +1197,48 @@ cancelButton.forEach(button => button.addEventListener("click", () => {
 //    await localStorage.delete();
 //    await location.reload();
 // }
+
+
+
+
+// --------- pseudocode for makeSelectionFromGuide
+
+// previousGuidePosition(); {
+//    let largestGuide = null;
+//    let secondLargestGuide = null;
+
+//    for (let i = 0; i < guidesResult[0].list.length; i++) {
+//       let currentGuide = guidesResult[0].list[i];
+      
+//       if (largestGuide === null || currentGuide.itemIndex > largestGuide.itemIndex) {
+//           secondLargestGuide = largestGuide;
+//           largestGuide = currentGuide;
+//       } else if (secondLargestGuide === null || currentGuide.itemIndex > secondLargestGuide.itemIndex) {
+//           secondLargestGuide = currentGuide;
+//       }
+//   }
+// }
+
+
+
+// MakeSelectionFromGuide(); {
+//    getLastGuideInfo().then(({ guidePosition, guideOrientation }) => {
+//       if (guidePosition < previousGuidePosition) {
+//          if (guideOrientation == "vertical") {
+//             subtractFromSelection();
+//          } else if (guideOrientation == "horizontal") {
+//             subtractFromSelection();
+//          }
+//       } else {
+//          MakeSelectionFromGuide();
+//       }
+//    }
+// }
+
+//---------- event listener 
+
+// const logAllActions = (event, descriptor) => {
+//    console.log("Event:", event);
+//    console.log("Descriptor:", JSON.stringify(descriptor, null, 2));
+// };
+//action.addNotificationListener(['all'], logAllActions);
