@@ -383,7 +383,7 @@ async function getSelectionBounds() {
       const left = 0;
       const right = app.activeDocument.width;
       const top = 0;
-      const bottom = app.activeDocument.width;
+      const bottom = app.activeDocument.height;
       return { left, top, right, bottom };
    }
 }
