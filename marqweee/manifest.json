@@ -12,18 +12,6 @@
   "featureFlags": {
     "enableSWCSupport": true
   },
-  "requiredPermissions": {
-    "launchProcess": {
-        "schemes": [
-            "https"
-        ]
-    },
-    "network": {
-        "domains": [
-            "https://github.com/Camlele/marqweee"
-        ]
-    }
-  },
   "manifestVersion": 5,
   "entrypoints": [
     {

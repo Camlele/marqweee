@@ -761,7 +761,7 @@ async function makeSelectionFromGuide() {
                { synchronousExecution: false, modalBehavior: "execute" });
                deleteLastGuide(lastGuide.ID);
                console.log("Result:", result);
-               console.log("Selection has been created based on horizontal guide position.");
+               console.log("Selection has been created based on vertical guide position.");
 
            } else if (lastGuideOrientation == "horizontal" && selectionExists && lastGuidePosition < bottom) {
                const result = batchPlay([{
